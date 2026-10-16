@@ -1,1 +1,491 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PDF Tools · Apps de Fydito</title><link rel="icon" type="image/png" href="fydito.png"><style>
+:root{color-scheme:light;--bg:#f4fff8;--panel:#fff;--fg:#17332b;--muted:#5a756b;--edge:#cbe7d7;--accent:#09a96b;--accent2:#007d65}
+html[data-theme=dark]{color-scheme:dark;--bg:#0a1420;--panel:#172335;--fg:#eefbfa;--muted:#a8c5c5;--edge:#2c5158;--accent:#21d2b0;--accent2:#10a7ac}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,Segoe UI,sans-serif;background:radial-gradient(ellipse at 85% 0%,rgba(32,205,130,.15),transparent 45%),var(--bg);color:var(--fg);min-height:100vh}
+main{max-width:1050px;margin:auto;padding:24px 16px 50px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.brand img{width:62px;height:62px;object-fit:contain;background:white;border-radius:16px;padding:5px}.brand h1{font-size:clamp(23px,4vw,36px);margin:0;line-height:1.1}.brand small{color:var(--muted)}.theme{border:1px solid var(--edge);background:var(--panel);color:var(--fg);border-radius:12px;padding:10px 15px;cursor:pointer}
+.pdf-card{border:1px solid var(--edge);border-radius:22px;background:var(--panel);padding:clamp(16px,3vw,32px);box-shadow:0 15px 40px #0000000c}.pdf-card>h2{margin:0 0 6px;font-size:24px}.pdf-intro{color:var(--muted);margin:0 0 22px}.pdf-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--edge);padding-bottom:16px}.pdf-tab{border:1px solid var(--edge);background:transparent;color:var(--fg);padding:11px 14px;border-radius:12px;cursor:pointer}.pdf-tab.active{background:var(--accent);color:#061e19;border-color:var(--accent);font-weight:750}.pdf-panel{display:none}.pdf-panel.active{display:block}.pdf-panel h3{font-size:20px;margin:0 0 6px}.pdf-panel p{color:var(--muted)}.pdf-panel label{display:block;font-weight:650;margin:14px 0 5px}.pdf-panel input:not([type=file]),.pdf-panel textarea,.pdf-panel select{display:block;width:100%;border:1px solid var(--edge);border-radius:10px;background:var(--bg);color:var(--fg);padding:12px;font:inherit}.pdf-panel input[type=file]{max-width:100%;margin:14px 0;padding:12px;border:1px dashed var(--edge);border-radius:12px}.pdf-panel button:not(.pdf-tab){background:var(--accent);color:#052a20;border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;margin:6px 6px 6px 0}.pdf-panel button:disabled{opacity:.5;cursor:not-allowed}.pdf-file-list{max-height:210px;overflow:auto;margin:10px 0}.pdf-file-list>div{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--bg);border-radius:10px;margin:6px 0;padding:8px 12px}.pdf-options-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.pdf-status{min-height:24px;margin:10px 0;font-weight:650}.pdf-status.ok{color:#0aab6a}.pdf-status.error{color:#e85d68}.pdf-reorder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin:16px 0}.pdf-reorder-page{background:var(--bg);border:1px solid var(--edge);border-radius:12px;padding:10px;text-align:center;cursor:grab}.pdf-reorder-page canvas{max-width:100%;height:auto}.pdf-reorder-number{display:block}.pdf-reorder-actions{display:flex;justify-content:center;gap:4px}.pdf-reorder-actions button{padding:6px!important}.foot{color:var(--muted);text-align:center;font-size:13px;margin-top:22px}
+@media(max-width:650px){.pdf-options-row{grid-template-columns:1fr}.brand img{width:48px;height:48px}.pdf-tabs{display:grid;grid-template-columns:1fr 1fr}.pdf-tab{font-size:13px}}
+</style><script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script></head><body><main><header class="top"><div class="brand"><img src="fydito.png" alt="Fydito"><div><h1>PDF Tools</h1><small>Apps de Fydito · Tus archivos, a tu manera</small></div></div><button class="theme" id="themeBtn" type="button">☀️ / 🌙</button></header><div class="utility-card pdf-card">
+<h2 id="seccion-pdf">📄 Herramientas PDF</h2>
+<p class="pdf-intro">Uní, separá o creá PDFs directamente en tu navegador. Los archivos se procesan localmente.</p>
+<div class="pdf-tabs">
+<button class="pdf-tab active" data-pdf-tab="unir" type="button">🔗 Unir</button>
+<button class="pdf-tab" data-pdf-tab="separar" type="button">✂️ Separar</button>
+<button class="pdf-tab" data-pdf-tab="reordenar" type="button">🔃 Reordenar</button>
+<button class="pdf-tab" data-pdf-tab="imagenes" type="button">🖼️ Imagen → PDF</button>
+<button class="pdf-tab" data-pdf-tab="texto" type="button">📝 Texto → PDF</button>
+<button class="pdf-tab" data-pdf-tab="word" type="button">📄 PDF → Word</button>
+</div>
+<div class="pdf-panel active" id="pdf-unir">
+<h3>🔗 Unir varios PDFs</h3>
+<p>Agregá PDFs desde una o varias carpetas. Podés cambiar el orden antes de unirlos.</p>
+<input accept=".pdf,application/pdf" aria-label="Agregar archivos PDF" id="pdfMergeFiles" multiple="" type="file"/>
+<button id="pdfMergeClear" style="margin-left:8px;" type="button">🧹 Limpiar lista</button>
+<div class="pdf-file-list" id="pdfMergeList"></div>
+<button id="pdfMergeBtn" type="button">Unir y descargar PDF</button>
+<div class="pdf-status" id="pdfMergeStatus"></div>
+</div>
+<div class="pdf-panel" id="pdf-separar">
+<h3>✂️ Separar / extraer páginas</h3>
+<p>Ejemplo: <strong>1-3, 5, 8-10</strong>.</p>
+<input accept=".pdf,application/pdf" id="pdfSplitFile" type="file"/>
+<label for="pdfPages">Páginas a extraer:</label>
+<input id="pdfPages" placeholder="Ej.: 1-3, 5, 8-10" type="text"/>
+<button id="pdfSplitBtn" type="button">Extraer y descargar PDF</button>
+<div class="pdf-status" id="pdfSplitStatus"></div>
+</div>
+<div class="pdf-panel" id="pdf-reordenar">
+<h3>🔃 Reordenar páginas</h3>
+<p>Elegí un PDF y arrastrá las páginas para cambiar su orden. También podés usar las flechas.</p>
+<input accept=".pdf,application/pdf" id="pdfReorderFile" type="file"/>
+<div class="pdf-reorder-grid" id="pdfReorderGrid"></div>
+<button disabled="" id="pdfReorderBtn" type="button">Descargar PDF reordenado</button>
+<button disabled="" id="pdfReorderClearBtn" type="button">🧹 Finalizar / limpiar</button>
+<div class="pdf-status" id="pdfReorderStatus"></div>
+</div>
+<div class="pdf-panel" id="pdf-imagenes">
+<h3>🖼️ Imágenes → PDF</h3>
+<p>Seleccioná una o varias imágenes. Cada una ocupará una página.</p>
+<input accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" id="pdfImageFiles" multiple="" type="file"/>
+<div class="pdf-options-row">
+<div><label for="pdfImageSize">Tamaño:</label>
+<select id="pdfImageSize"><option value="a4">A4</option><option value="original">Tamaño de imagen</option></select>
+</div>
+<div><label for="pdfImageOrientation">Orientación:</label>
+<select id="pdfImageOrientation"><option value="auto">Automática</option><option value="portrait">Vertical</option><option value="landscape">Horizontal</option></select>
+</div>
+</div>
+<div class="pdf-file-list" id="pdfImageList"></div>
+<button id="pdfImagesBtn" type="button">Crear y descargar PDF</button>
+<div class="pdf-status" id="pdfImagesStatus"></div>
+</div>
+<div class="pdf-panel" id="pdf-texto">
+<h3>📝 Texto → PDF</h3>
+<label for="pdfTextTitle">Título:</label>
+<input id="pdfTextTitle" placeholder="Ej.: Nota interna" type="text"/>
+<label for="pdfTextContent">Texto:</label>
+<textarea id="pdfTextContent" placeholder="Escribí o pegá el texto acá..." rows="12"></textarea>
+<div class="pdf-options-row">
+<div><label for="pdfTextSize">Tamaño de letra:</label>
+<select id="pdfTextSize"><option>10</option><option>11</option><option selected="">12</option><option>14</option><option>16</option></select>
+</div>
+<div><label for="pdfTextFilename">Nombre del archivo:</label>
+<input id="pdfTextFilename" placeholder="documento" type="text"/>
+</div>
+</div>
+<button id="pdfTextBtn" type="button">Crear y descargar PDF</button>
+<div class="pdf-status" id="pdfTextStatus"></div>
+</div>
 
+</div><p class="foot">Procesamiento local en tu navegador · Sin subir archivos al servidor</p></main><script>
+        (function() {
+            const {
+                PDFDocument,
+                StandardFonts,
+                rgb
+            } = PDFLib;
+            const status = (id, msg, type = '') => {
+                const e = document.getElementById(id);
+                e.textContent = msg;
+                e.className = 'pdf-status ' + type;
+            };
+            const download = (bytes, name) => {
+                const u = URL.createObjectURL(new Blob([bytes], {
+                    type: 'application/pdf'
+                }));
+                const a = document.createElement('a');
+                a.href = u;
+                a.download = name;
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(u), 1500);
+            };
+            const safe = s => (s || 'documento').trim().replace(/[<>:"/\\\\|?*\x00-\x1F]/g, '') || 'documento';
+
+            document.querySelectorAll('.pdf-tab').forEach(b => b.onclick = () => {
+                document.querySelectorAll('.pdf-tab,.pdf-panel').forEach(x => x.classList.remove('active'));
+                b.classList.add('active');
+                document.getElementById('pdf-' + b.dataset.pdfTab).classList.add('active');
+            });
+
+            function listFiles(inputId, listId) {
+                const i = document.getElementById(inputId),
+                    l = document.getElementById(listId);
+                i.onchange = () => {
+                    l.innerHTML = '';
+                    [...i.files].forEach((f, n) => {
+                        const d = document.createElement('div');
+                        d.textContent = `${n+1}. ${f.name}`;
+                        l.appendChild(d);
+                    });
+                };
+            }
+            // La selección es acumulativa: elegir desde otra carpeta no borra lo anterior.
+            const mergeFiles = [];
+            const mergeInput = document.getElementById('pdfMergeFiles');
+            const mergeList = document.getElementById('pdfMergeList');
+            function renderMergeFiles() {
+                mergeList.replaceChildren();
+                mergeFiles.forEach((file, index) => {
+                    const row = document.createElement('div');
+                    row.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 9px;margin:5px 0;border-radius:7px;background:rgba(120,130,150,.09)';
+                    const label = document.createElement('span');
+                    label.style.cssText = 'flex:1;min-width:150px;overflow-wrap:anywhere';
+                    label.textContent = `${index + 1}. ${file.name}`;
+                    row.appendChild(label);
+                    for (const [symbol, title, target] of [['↑','Subir',index-1],['↓','Bajar',index+1]]) {
+                        const btn = document.createElement('button');
+                        btn.type = 'button'; btn.textContent = symbol; btn.title = title;
+                        btn.disabled = target < 0 || target >= mergeFiles.length;
+                        btn.style.cssText = 'min-width:32px;width:32px;padding:5px;margin:0';
+                        btn.onclick = () => { [mergeFiles[index],mergeFiles[target]] = [mergeFiles[target],mergeFiles[index]]; renderMergeFiles(); };
+                        row.appendChild(btn);
+                    }
+                    const remove = document.createElement('button');
+                    remove.type = 'button'; remove.textContent = '✕'; remove.title = 'Quitar PDF';
+                    remove.style.cssText = 'min-width:32px;width:32px;padding:5px;margin:0';
+                    remove.onclick = () => { mergeFiles.splice(index,1); renderMergeFiles(); };
+                    row.appendChild(remove);
+                    mergeList.appendChild(row);
+                });
+                status('pdfMergeStatus', mergeFiles.length ? `${mergeFiles.length} PDF(s) en la lista.` : '');
+            }
+            mergeInput.addEventListener('change', () => {
+                for (const file of mergeInput.files) {
+                    if (file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf') mergeFiles.push(file);
+                }
+                mergeInput.value = ''; // Permite volver a elegir el mismo archivo.
+                renderMergeFiles();
+            });
+            document.getElementById('pdfMergeClear').onclick = () => { mergeFiles.length = 0; mergeInput.value = ''; renderMergeFiles(); };
+            listFiles('pdfImageFiles', 'pdfImageList');
+
+            document.getElementById('pdfMergeBtn').onclick = async() => {
+                const files = [...mergeFiles];
+                if (files.length < 2) return status('pdfMergeStatus', 'Elegí al menos dos PDFs.', 'error');
+                try {
+                    status('pdfMergeStatus', 'Uniendo archivos...');
+                    const out = await PDFDocument.create();
+                    for (const f of files) {
+                        const src = await PDFDocument.load(await f.arrayBuffer());
+                        const ps = await out.copyPages(src, src.getPageIndices());
+                        ps.forEach(p => out.addPage(p));
+                    }
+                    download(await out.save(), 'PDF_unidos.pdf');
+                    status('pdfMergeStatus', `Listo: ${files.length} PDFs unidos.`, 'ok');
+                } catch (e) {
+                    console.error(e);
+                    status('pdfMergeStatus', 'No se pudieron unir. Verificá que los PDFs no estén protegidos.', 'error');
+                }
+            };
+
+            function pages(text, total) {
+                const out = [],
+                    seen = new Set();
+                for (const part of text.split(',').map(x => x.trim()).filter(Boolean)) {
+                    let nums = [];
+                    if (/^\d+$/.test(part)) nums = [+part];
+                    else {
+                        const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+                        if (!m) throw 0;
+                        let a = +m[1],
+                            b = +m[2];
+                        if (a > b)[a, b] = [b, a];
+                        for (let n = a; n <= b; n++) nums.push(n);
+                    }
+                    for (const n of nums) {
+                        if (n < 1 || n > total) throw 0;
+                        if (!seen.has(n)) {
+                            seen.add(n);
+                            out.push(n - 1);
+                        }
+                    }
+                }
+                if (!out.length) throw 0;
+                return out;
+            }
+
+            document.getElementById('pdfSplitBtn').onclick = async() => {
+                const f = document.getElementById('pdfSplitFile').files[0],
+                    r = document.getElementById('pdfPages').value;
+                if (!f || !r.trim()) return status('pdfSplitStatus', 'Elegí un PDF e indicá las páginas.', 'error');
+                try {
+                    const src = await PDFDocument.load(await f.arrayBuffer()),
+                        idx = pages(r, src.getPageCount()),
+                        out = await PDFDocument.create();
+                    (await out.copyPages(src, idx)).forEach(p => out.addPage(p));
+                    download(await out.save(), safe(f.name.replace(/\.pdf$/i, '') + '_paginas') + '.pdf');
+                    status('pdfSplitStatus', `Listo: ${idx.length} página(s) extraída(s).`, 'ok');
+                } catch (e) {
+                    status('pdfSplitStatus', 'Revisá el rango. Ejemplo: 1-3, 5, 8-10.', 'error');
+                }
+            };
+
+            // ---- Reordenar páginas PDF ----
+            const pdfReorderFile = document.getElementById('pdfReorderFile');
+            const pdfReorderGrid = document.getElementById('pdfReorderGrid');
+            const pdfReorderBtn = document.getElementById('pdfReorderBtn');
+            const pdfReorderClearBtn = document.getElementById('pdfReorderClearBtn');
+            let pdfReorderBytes = null;
+            let pdfReorderOrder = [];
+            let draggedReorderIndex = null;
+
+            if (window.pdfjsLib) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            }
+
+            function refreshReorderNumbers() {
+                [...pdfReorderGrid.children].forEach((card, i) => {
+                    const number = card.querySelector('.pdf-reorder-number');
+                    if (number) number.textContent = `Posición ${i + 1} · Página original ${Number(card.dataset.page) + 1}`;
+                    const left = card.querySelector('[data-move="left"]');
+                    const right = card.querySelector('[data-move="right"]');
+                    if (left) left.disabled = i === 0;
+                    if (right) right.disabled = i === pdfReorderGrid.children.length - 1;
+                });
+                pdfReorderOrder = [...pdfReorderGrid.children].map(card => Number(card.dataset.page));
+            }
+
+            function moveReorderCard(card, direction) {
+                if (direction < 0 && card.previousElementSibling) {
+                    pdfReorderGrid.insertBefore(card, card.previousElementSibling);
+                } else if (direction > 0 && card.nextElementSibling) {
+                    pdfReorderGrid.insertBefore(card.nextElementSibling, card);
+                }
+                refreshReorderNumbers();
+            }
+
+            pdfReorderFile.addEventListener('change', async () => {
+                const f = pdfReorderFile.files[0];
+                pdfReorderGrid.innerHTML = '';
+                pdfReorderBtn.disabled = true;
+                pdfReorderClearBtn.disabled = true;
+                pdfReorderBytes = null;
+                pdfReorderOrder = [];
+                if (!f) return;
+
+                try {
+                    status('pdfReorderStatus', 'Generando miniaturas...');
+                    pdfReorderBytes = new Uint8Array(await f.arrayBuffer());
+                    if (!window.pdfjsLib) throw new Error('PDF.js no disponible');
+                    const preview = await pdfjsLib.getDocument({data: pdfReorderBytes.slice()}).promise;
+
+                    for (let pageNum = 1; pageNum <= preview.numPages; pageNum++) {
+                        const page = await preview.getPage(pageNum);
+                        const base = page.getViewport({scale: 1});
+                        const scale = Math.min(1.25, 150 / base.width);
+                        const viewport = page.getViewport({scale});
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.ceil(viewport.width);
+                        canvas.height = Math.ceil(viewport.height);
+                        await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+
+                        const card = document.createElement('div');
+                        card.className = 'pdf-reorder-page';
+                        card.draggable = true;
+                        card.dataset.page = String(pageNum - 1);
+                        const label = document.createElement('div');
+                        label.className = 'pdf-reorder-number';
+                        const actions = document.createElement('div');
+                        actions.className = 'pdf-reorder-actions';
+                        actions.innerHTML = '<button type="button" data-move="left" title="Mover a la izquierda">←</button><button type="button" data-move="right" title="Mover a la derecha">→</button>';
+                        actions.querySelector('[data-move="left"]').onclick = () => moveReorderCard(card, -1);
+                        actions.querySelector('[data-move="right"]').onclick = () => moveReorderCard(card, 1);
+                        card.append(canvas, label, actions);
+
+                        card.addEventListener('dragstart', () => {
+                            draggedReorderIndex = card;
+                            card.classList.add('dragging');
+                        });
+                        card.addEventListener('dragend', () => {
+                            card.classList.remove('dragging');
+                            [...pdfReorderGrid.children].forEach(x => x.classList.remove('drag-over'));
+                            draggedReorderIndex = null;
+                            refreshReorderNumbers();
+                        });
+                        card.addEventListener('dragover', e => {
+                            e.preventDefault();
+                            if (draggedReorderIndex && draggedReorderIndex !== card) card.classList.add('drag-over');
+                        });
+                        card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+                        card.addEventListener('drop', e => {
+                            e.preventDefault();
+                            card.classList.remove('drag-over');
+                            if (!draggedReorderIndex || draggedReorderIndex === card) return;
+                            const cards = [...pdfReorderGrid.children];
+                            const from = cards.indexOf(draggedReorderIndex);
+                            const to = cards.indexOf(card);
+                            if (from < to) pdfReorderGrid.insertBefore(draggedReorderIndex, card.nextSibling);
+                            else pdfReorderGrid.insertBefore(draggedReorderIndex, card);
+                            refreshReorderNumbers();
+                        });
+
+                        pdfReorderGrid.appendChild(card);
+                    }
+                    refreshReorderNumbers();
+                    pdfReorderBtn.disabled = false;
+                    pdfReorderClearBtn.disabled = false;
+                    status('pdfReorderStatus', `Listo: ${preview.numPages} página(s). Arrastralas al orden que quieras.`, 'ok');
+                } catch (e) {
+                    console.error(e);
+                    pdfReorderGrid.innerHTML = '';
+                    pdfReorderBtn.disabled = true;
+                    status('pdfReorderStatus', 'No se pudo abrir el PDF. Verificá que no esté protegido.', 'error');
+                }
+            });
+
+            pdfReorderClearBtn.addEventListener('click', () => {
+                pdfReorderFile.value = '';
+                pdfReorderGrid.innerHTML = '';
+                pdfReorderBytes = null;
+                pdfReorderOrder = [];
+                draggedReorderIndex = null;
+                pdfReorderBtn.disabled = true;
+                pdfReorderClearBtn.disabled = true;
+                status('pdfReorderStatus', '');
+            });
+
+            pdfReorderBtn.addEventListener('click', async () => {
+                const f = pdfReorderFile.files[0];
+                if (!f || !pdfReorderBytes || !pdfReorderOrder.length) return status('pdfReorderStatus', 'Primero elegí un PDF.', 'error');
+                try {
+                    status('pdfReorderStatus', 'Creando PDF reordenado...');
+                    const src = await PDFDocument.load(pdfReorderBytes.slice());
+                    const out = await PDFDocument.create();
+                    const copied = await out.copyPages(src, pdfReorderOrder);
+                    copied.forEach(p => out.addPage(p));
+                    download(await out.save(), safe(f.name.replace(/\.pdf$/i, '') + '_reordenado') + '.pdf');
+                    status('pdfReorderStatus', 'Listo: PDF reordenado y descargado.', 'ok');
+                } catch (e) {
+                    console.error(e);
+                    status('pdfReorderStatus', 'No se pudo generar el PDF reordenado.', 'error');
+                }
+            });
+
+            async function imageBytes(f) {
+                if (f.type === 'image/jpeg') return ['jpg', await f.arrayBuffer()];
+                if (f.type === 'image/png') return ['png', await f.arrayBuffer()];
+                const url = await new Promise((ok, no) => {
+                    const r = new FileReader();
+                    r.onload = () => ok(r.result);
+                    r.onerror = no;
+                    r.readAsDataURL(f);
+                });
+                const im = await new Promise((ok, no) => {
+                    const i = new Image();
+                    i.onload = () => ok(i);
+                    i.onerror = no;
+                    i.src = url;
+                });
+                const c = document.createElement('canvas');
+                c.width = im.naturalWidth;
+                c.height = im.naturalHeight;
+                c.getContext('2d').drawImage(im, 0, 0);
+                const blob = await new Promise(ok => c.toBlob(ok, 'image/png'));
+                return ['png', await blob.arrayBuffer()];
+            }
+
+            document.getElementById('pdfImagesBtn').onclick = async() => {
+                const fs = [...document.getElementById('pdfImageFiles').files];
+                if (!fs.length) return status('pdfImagesStatus', 'Elegí al menos una imagen.', 'error');
+                try {
+                    status('pdfImagesStatus', 'Creando PDF...');
+                    const pdf = await PDFDocument.create(),
+                        mode = document.getElementById('pdfImageSize').value,
+                        ori = document.getElementById('pdfImageOrientation').value;
+                    for (const f of fs) {
+                        const [t, b] = await imageBytes(f), im = t === 'jpg' ? await pdf.embedJpg(b) : await pdf.embedPng(b);
+                        let pw, ph;
+                        if (mode === 'original') {
+                            pw = im.width;
+                            ph = im.height;
+                            if (ori === 'portrait' && pw > ph)[pw, ph] = [ph, pw];
+                            if (ori === 'landscape' && ph > pw)[pw, ph] = [ph, pw];
+                        } else {
+                            const o = ori === 'auto' ? (im.width > im.height ? 'landscape' : 'portrait') : ori;
+                            [pw, ph] = o === 'landscape' ? [841.89, 595.28] : [595.28, 841.89];
+                        }
+                        const p = pdf.addPage([pw, ph]),
+                            m = mode === 'a4' ? 28 : 0,
+                            scale = Math.min((pw - 2 * m) / im.width, (ph - 2 * m) / im.height),
+                            w = im.width * scale,
+                            h = im.height * scale;
+                        p.drawImage(im, {
+                            x: (pw - w) / 2,
+                            y: (ph - h) / 2,
+                            width: w,
+                            height: h
+                        });
+                    }
+                    download(await pdf.save(), 'imagenes.pdf');
+                    status('pdfImagesStatus', `Listo: ${fs.length} imagen(es) convertida(s).`, 'ok');
+                } catch (e) {
+                    console.error(e);
+                    status('pdfImagesStatus', 'No se pudo crear el PDF.', 'error');
+                }
+            };
+
+            function wrap(text, font, size, max) {
+                const lines = [];
+                for (const para of text.replace(/\r/g, '').split('\n')) {
+                    if (!para.trim()) {
+                        lines.push('');
+                        continue;
+                    }
+                    let line = '';
+                    for (const word of para.split(/\s+/)) {
+                        const test = line ? line + ' ' + word : word;
+                        if (font.widthOfTextAtSize(test, size) <= max) line = test;
+                        else {
+                            if (line) lines.push(line);
+                            line = word;
+                        }
+                    }
+                    if (line) lines.push(line);
+                }
+                return lines;
+            }
+
+            document.getElementById('pdfTextBtn').onclick = async() => {
+                const title = document.getElementById('pdfTextTitle').value.trim(),
+                    text = document.getElementById('pdfTextContent').value,
+                    size = +document.getElementById('pdfTextSize').value;
+                if (!title && !text.trim()) return status('pdfTextStatus', 'Escribí un título o algún texto.', 'error');
+                try {
+                    const pdf = await PDFDocument.create(),
+                        normal = await pdf.embedFont(StandardFonts.Helvetica),
+                        bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+                    const W = 595.28,
+                        H = 841.89,
+                        M = 55,
+                        max = W - 2 * M;
+                    let p = pdf.addPage([W, H]),
+                        y = H - M;
+                    const put = (line, font, sz) => {
+                        if (y < M + sz) {
+                            p = pdf.addPage([W, H]);
+                            y = H - M;
+                        }
+                        if (line) p.drawText(line, {
+                            x: M,
+                            y,
+                            size: sz,
+                            font,
+                            color: rgb(.18, .18, .2)
+                        });
+                        y -= sz * 1.45;
+                    };
+                    if (title) {
+                        wrap(title, bold, 20, max).forEach(x => put(x, bold, 20));
+                        y -= 10;
+                    }
+                    wrap(text, normal, size, max).forEach(x => put(x, normal, size));
+                    const name = safe(document.getElementById('pdfTextFilename').value || title || 'documento');
+                    download(await pdf.save(), name + '.pdf');
+                    status('pdfTextStatus', 'PDF creado y descargado.', 'ok');
+                } catch (e) {
+                    console.error(e);
+                    status('pdfTextStatus', 'No se pudo crear. Probá quitar emojis o símbolos especiales del texto.', 'error');
+                }
+            };
+
+        })();</script><script>const root=document.documentElement;root.dataset.theme=localStorage.getItem('fydito-pdf-theme')||'light';document.getElementById('themeBtn').onclick=()=>{root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('fydito-pdf-theme',root.dataset.theme)};</script></body></html>
