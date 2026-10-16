@@ -1,1 +1,263 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Calendarios · Apps de Fydito</title><style>
+:root{font-family:system-ui,'Segoe UI',sans-serif;color:#22313d;background:#f2f6f8}*{box-sizing:border-box}body{margin:0}.app{max-width:1220px;margin:auto;padding:24px}h1{margin:0;font-size:27px}p{color:#657581}.toolbar,.panel{background:white;border:1px solid #dbe5e9;border-radius:16px;padding:18px;margin:16px 0;box-shadow:0 4px 16px #122204}.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.field{display:grid;gap:5px;min-width:135px;flex:1}label{font-size:13px;font-weight:650}input,select,button{font:inherit;border:1px solid #cbd8df;border-radius:9px;padding:10px;min-width:0}input[type=color]{height:40px;padding:4px;width:62px}button{background:#167d89;color:white;border:0;cursor:pointer;font-weight:650}button.secondary{background:#e7f1f2;color:#176773}button.danger{background:#fce8e8;color:#9b3434}button:hover{filter:brightness(.96)}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px}.tabs button{background:#e0ebee;color:#36525b}.tabs button.active{background:#167d89;color:white}.hint{font-size:13px;color:#5c7079}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.person{border:1px solid #e0e9ed;border-radius:12px;padding:12px;margin:12px 0}.personhead{display:flex;gap:12px;align-items:center;justify-content:space-between}.period{display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:8px 0}.period .field{max-width:210px}.hidden{display:none!important}.status{font-size:13px;color:#536b76}.sheet{background:white;margin:14px auto;padding:14mm;width:100%;min-height:230mm;box-shadow:0 6px 25px #1232;border-radius:4px;overflow:hidden}.sheet h2{margin:0 0 4mm;text-align:center;font-size:22px}.sheet small{color:#687782}.cal{width:100%;border-collapse:collapse;table-layout:fixed}.cal th{background:#e8f2f4;padding:7px;border:1px solid #cbd7db}.cal td{border:1px solid #ccd7db;vertical-align:top;padding:5px}.cal td.empty{background:#f5f7f8}.day{font-weight:700;font-size:13px}.holiday{background:#fff1e5!important}.holiday .day{color:#aa4b0a}.holname{font-size:9px;color:#99500e;overflow-wrap:anywhere;line-height:1.2}.week td{height:150mm}.month td{height:29mm}.miniwrap{display:grid;grid-template-columns:repeat(3,1fr);gap:8mm}.miniwrap.sem{grid-template-columns:repeat(2,1fr)}.mini h3{margin:0 0 5px;font-size:15px}.mini .cal th{font-size:10px;padding:3px}.mini .cal td{height:12mm;padding:2px;font-size:10px}.mini .day{font-size:10px}.mini .holname{display:none}.vac{border-collapse:collapse;width:100%;table-layout:fixed}.vac th,.vac td{border:1px solid #d0dce0;padding:3px;text-align:center;font-size:10px;height:27px}.vac th:first-child,.vac td:first-child{width:145px;text-align:left;overflow-wrap:anywhere}.vac .datehead{font-size:9px}.vac .holidaycell{background:#fff1e5}.legend{margin-top:8px;font-size:11px;display:flex;gap:10px;flex-wrap:wrap}.swatch{display:inline-block;width:12px;height:12px;vertical-align:middle;border-radius:2px}.subheading{font-size:12px;color:#526771;margin:0 0 10px;text-align:center}.note{font-size:11px;color:#60717c;margin-top:12px}.print-only{display:none}@media(max-width:700px){.app{padding:12px}.sheet{padding:12px;min-height:0}.month td{height:70px}.week td{height:250px}.miniwrap{grid-template-columns:repeat(2,1fr)}.vac th:first-child,.vac td:first-child{width:85px}.vac th,.vac td{font-size:8px;padding:2px}}
+@page{size:A4 landscape;margin:9mm}@media print{body{background:white}.no-print{display:none!important}.app{max-width:none;padding:0}.sheet{box-shadow:none;border:0;border-radius:0;margin:0;width:100%;min-height:0;padding:0;break-after:page;page-break-after:always}.sheet:last-child{break-after:auto;page-break-after:auto}.week td{height:155mm}.month td{height:30mm}.miniwrap{gap:6mm}.vac th,.vac td{height:26px}body.portrait .sheet{width:100%}body.portrait .month td{height:36mm}}
 
+:root{--accent:#167d89;--head:#e8f2f4;--holiday:#fff1e5;--paper:#fff}
+button:not(.danger):not(.secondary),.tabs button.active{background:var(--accent)}
+.sheet{background:var(--paper)}.cal th{background:var(--head)}.holiday,.vac .holidaycell{background:var(--holiday)!important}
+.theme-menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin:14px 0}.theme-option{background:#fff!important;color:#283944;border:1px solid #ccd8dc!important;padding:8px;display:grid;gap:5px;text-align:left}.theme-option.chosen{outline:2px solid var(--accent)}.swatches{display:flex;height:18px;gap:2px}.swatches i{flex:1;border-radius:3px;border:1px solid #ddd}
+.custom-heading{text-align:center;font-weight:700;font-size:17px;margin:0 0 4mm;color:var(--accent)}
+.sheet-footer{display:flex;gap:9mm;align-items:stretch;margin-top:7mm;min-height:30mm}.note-lines{flex:1;display:flex;flex-direction:column;justify-content:space-between}.note-lines div{border-bottom:1px solid #a6a6a6;height:6mm}.footer-image{width:25%;display:flex;align-items:center;justify-content:center}.footer-image img{max-width:100%;max-height:36mm;object-fit:contain}
+.annual-heading{display:grid;grid-template-columns:1fr 3fr 1fr;align-items:center;gap:8mm;min-height:22mm;margin-bottom:4mm}.annual-heading h2{margin:0}.annual-heading img{width:100%;height:21mm;object-fit:contain}
+.holiday-list{font-size:9px;line-height:1.25;margin-top:4px;color:#4a5560}.holiday-list>div{margin:2px 0}
+.week td{height:122mm}.month td{height:22mm}.miniwrap.sem{gap:5mm 8mm}.miniwrap.sem .cal td{height:8mm}.miniwrap.sem .mini h3{margin-bottom:3px}
+@media print{.week td{height:119mm}.month td{height:21mm}.sheet-footer{margin-top:5mm}.miniwrap.sem .cal td{height:7.7mm}.miniwrap:not(.sem) .cal td{height:9mm}body.portrait .month td{height:25mm}body.portrait .week td{height:165mm}}
+
+
+</style><style id="pageStyle">
+:root{--accent:#167d89;--head:#e8f2f4;--holiday:#fff1e5;--paper:#fff}
+button:not(.danger):not(.secondary),.tabs button.active{background:var(--accent)}
+.sheet{background:var(--paper)}.cal th{background:var(--head)}.holiday,.vac .holidaycell{background:var(--holiday)!important}
+.theme-menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin:14px 0}.theme-option{background:#fff!important;color:#283944;border:1px solid #ccd8dc!important;padding:8px;display:grid;gap:5px;text-align:left}.theme-option.chosen{outline:2px solid var(--accent)}.swatches{display:flex;height:18px;gap:2px}.swatches i{flex:1;border-radius:3px;border:1px solid #ddd}
+.custom-heading{text-align:center;font-weight:700;font-size:17px;margin:0 0 4mm;color:var(--accent)}
+.sheet-footer{display:flex;gap:9mm;align-items:stretch;margin-top:7mm;min-height:30mm}.note-lines{flex:1;display:flex;flex-direction:column;justify-content:space-between}.note-lines div{border-bottom:1px solid #a6a6a6;height:6mm}.footer-image{width:25%;display:flex;align-items:center;justify-content:center}.footer-image img{max-width:100%;max-height:36mm;object-fit:contain}
+.annual-heading{display:grid;grid-template-columns:1fr 3fr 1fr;align-items:center;gap:8mm;min-height:22mm;margin-bottom:4mm}.annual-heading h2{margin:0}.annual-heading img{width:100%;height:21mm;object-fit:contain}
+.holiday-list{font-size:9px;line-height:1.25;margin-top:4px;color:#4a5560}.holiday-list>div{margin:2px 0}
+.week td{height:122mm}.month td{height:22mm}.miniwrap.sem{gap:5mm 8mm}.miniwrap.sem .cal td{height:8mm}.miniwrap.sem .mini h3{margin-bottom:3px}
+@media print{.week td{height:119mm}.month td{height:21mm}.sheet-footer{margin-top:5mm}.miniwrap.sem .cal td{height:7.7mm}.miniwrap:not(.sem) .cal td{height:9mm}body.portrait .month td{height:25mm}body.portrait .week td{height:165mm}}
+
+/* v3: legibilidad y ahorro de tinta */
+.sheet{background:#fff!important}.cal td:not(.empty),.vac td{background:#fff}
+.cal td.holiday{background:#fff!important;box-shadow:inset 3px 0 0 var(--accent)}
+.cal td.holiday .day{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.vac .holidaycell{background:#fff!important;box-shadow:inset 0 -2px 0 var(--accent)}
+.cal td.empty{background:#fafafa}
+.sheet h2{font-size:var(--title-size,28px);line-height:1.16;overflow-wrap:anywhere}
+.custom-heading{font-size:var(--title-size,28px);line-height:1.18;overflow-wrap:anywhere}
+.annual-heading{grid-template-columns:minmax(0,1fr) minmax(0,3fr) minmax(0,1fr)}
+.annual-heading h2{min-width:0}
+@media print{.sheet{background:#fff!important}.cal td.holiday{-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet h2,.custom-heading{break-inside:avoid}}
+
+/* v3.1: calendario anual completo en una sola hoja A4 */
+.sheet.annual-sheet .miniwrap{grid-template-columns:repeat(3,minmax(0,1fr));gap:3mm 5mm}
+.sheet.annual-sheet .mini{min-width:0;break-inside:avoid;page-break-inside:avoid}
+.sheet.annual-sheet .mini h3{font-size:11px;margin:0 0 2px;line-height:1.1}
+.sheet.annual-sheet .cal th{font-size:8px;padding:1px;line-height:1.1}
+.sheet.annual-sheet .cal td{height:5.4mm;padding:1px;line-height:1.1}
+.sheet.annual-sheet .day{font-size:8px}
+.sheet.annual-sheet .annual-heading{min-height:17mm;margin-bottom:3mm}
+.sheet.annual-sheet .annual-heading img{height:16mm}
+@media print{
+ .sheet.annual-sheet{min-height:0;height:auto;break-inside:avoid;page-break-inside:avoid}
+ .sheet.annual-sheet .miniwrap:not(.sem) .cal td{height:5.4mm}
+ body.portrait .sheet.annual-sheet .miniwrap:not(.sem) .cal td{height:8mm}
+ body.portrait .sheet.annual-sheet .miniwrap{gap:5mm 4mm}
+}
+
+/* v3.2: dimensiones de impresión específicas para semestral y anual.
+   No se modifica la lógica de vacaciones. */
+.sheet.semester-sheet .miniwrap.sem{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sheet.semester-sheet .mini{min-width:0;break-inside:avoid;page-break-inside:avoid}
+@media print{
+  html,body,.app,#output{margin:0!important;padding:0!important;max-width:none!important}
+  .sheet{break-after:auto;page-break-after:auto}
+  .sheet.semester-sheet,.sheet.annual-sheet{
+    width:100%!important;max-width:100%!important;
+    margin:0!important;padding:0!important;min-height:0!important;
+    break-after:page;page-break-after:always;
+  }
+  .sheet.semester-sheet:last-child,.sheet.annual-sheet:last-child{break-after:auto;page-break-after:auto}
+  .sheet.semester-sheet h2{margin:0 0 3mm;line-height:1.1}
+  .sheet.semester-sheet .miniwrap.sem{gap:3mm 5mm;align-content:start}
+  .sheet.semester-sheet .mini h3{font-size:11px;line-height:1.1;margin:0 0 1mm}
+  .sheet.semester-sheet .mini .cal{width:100%;border-collapse:collapse}
+  .sheet.semester-sheet .mini .cal th{height:4mm;font-size:8px;padding:0;line-height:1}
+  .sheet.semester-sheet .mini .cal td,
+  body.portrait .sheet.semester-sheet .mini .cal td{
+    height:5.9mm!important;min-height:0!important;padding:1px!important;
+    font-size:8px;line-height:1.05
+  }
+  .sheet.semester-sheet .mini .day{font-size:8px}
+  .sheet.semester-sheet .holiday-list{font-size:8px;line-height:1.15;margin-top:1mm}
+  .sheet.semester-sheet .holiday-list>div{margin:1px 0}
+  .sheet.annual-sheet .miniwrap{gap:3mm 4mm}
+  .sheet.annual-sheet .mini .cal td,
+  body.portrait .sheet.annual-sheet .mini .cal td{height:5.4mm!important}
+}
+
+/* Vacaciones v4: calendarios a demanda y franjas semanales continuas */
+.vac-controls{margin:10px 0 18px}.vac-controls .field{max-width:230px}
+.vac-calendar-grid{display:grid;gap:5mm}.vac-calendar-grid.month{grid-template-columns:1fr}.vac-calendar-grid.semester{grid-template-columns:repeat(2,minmax(0,1fr));gap:4mm}.vac-calendar-grid.year{grid-template-columns:repeat(3,minmax(0,1fr));gap:3mm}
+.vac-month{min-width:0;break-inside:avoid;page-break-inside:avoid}.vac-month h3{font-size:17px;margin:0 0 7px;color:var(--accent);text-align:center}.vac-month.compact h3{font-size:12px;margin-bottom:3px}
+.vac-weekdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center;background:var(--head);font-size:11px;font-weight:650;padding:5px 0}.vac-month.compact .vac-weekdays{font-size:9px;padding:2px 0}
+.vac-week{display:grid;grid-auto-flow:row;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:18px repeat(var(--lanes),minmax(17px,auto));grid-auto-rows:0;border-left:1px solid #cdd8df;border-top:1px solid #cdd8df;min-height:63px;align-content:start}
+.vac-day{grid-row:1 / span var(--total-rows);border-right:1px solid #cdd8df;border-bottom:1px solid #cdd8df;font-size:11px;font-weight:650;padding:3px 4px;min-width:0;z-index:0}.vac-day.outside{background:#f7f8f8}.vac-day.vac-holiday{color:var(--accent);text-decoration:underline}
+.vac-bar{position:relative;z-index:1;align-self:center;min-width:0;min-height:16px;margin:1px 2px;padding:2px 4px;border-radius:4px;background:var(--person-color);background:color-mix(in srgb,var(--person-color) 80%,white);border:1px solid var(--person-color);color:#17212a;font-size:10px;line-height:1.1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.vac-bar span{overflow:hidden;text-overflow:ellipsis;display:block}
+.vac-type-legend{display:flex;gap:18px;justify-content:center;font-size:11px;margin:0 0 4mm;flex-wrap:wrap}.vac-type-legend span{display:flex;align-items:center;gap:5px}.vac-key{width:21px;height:9px;background:#e7f2fa;border:1px solid #6d99b7;border-left-width:4px}.vac-key.stress{background:#fff2df;border-style:dashed;border-left:4px solid #c68b43}
+.vac-month.compact .vac-week{grid-template-rows:12px repeat(var(--lanes),minmax(12px,auto));min-height:27px}.vac-month.compact .vac-day{font-size:8px;padding:1px 2px}.vac-month.compact .vac-bar{font-size:7px;min-height:10px;margin:0 1px;padding:1px 2px;border-radius:2px;border-left-width:1px}
+.vac-calendar-grid.year .vac-month.compact .vac-week{grid-template-rows:10px repeat(var(--lanes),minmax(10px,auto));min-height:23px}
+.vac-calendar-grid.year .vac-month.compact .vac-bar{font-size:6px;min-height:9px}
+@media print{
+ .vacation-sheet{break-after:auto;page-break-after:auto;height:auto;min-height:0}
+ .vacation-sheet .vac-month{break-inside:avoid;page-break-inside:avoid}
+ .vacation-sheet.vac-month .vac-week{min-height:24mm;grid-template-rows:6mm repeat(var(--lanes),minmax(5mm,auto))}
+ .vacation-sheet.vac-semester .vac-month.compact .vac-week{min-height:7mm;grid-template-rows:3mm repeat(var(--lanes),minmax(3mm,auto))}
+ .vacation-sheet.vac-year .vac-month.compact .vac-week{min-height:5mm;grid-template-rows:2.5mm repeat(var(--lanes),minmax(2.5mm,auto))}
+ .vac-bar{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media(max-width:700px){.vac-calendar-grid.semester,.vac-calendar-grid.year{grid-template-columns:1fr}.vac-calendar-grid.year .vac-month.compact .vac-bar{font-size:9px}}
+
+/* v4.3: paleta fija de 256 colores y bandas visibles */
+.person-color-button{width:56px;height:40px;padding:5px;background:#fff!important;border:1px solid #cbd8df!important;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.person-color-button .color-sample{display:block;width:100%;height:100%;border-radius:5px;border:1px solid #0002}
+.person-palette{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:3px;max-width:430px;padding:9px;margin-top:6px;border:1px solid #cbd8df;border-radius:10px;background:#fff}
+.person-palette button{min-width:0;aspect-ratio:1;padding:0;border-radius:3px;border:1px solid #0002;background:var(--swatch)!important}
+.person-palette button.selected{outline:2px solid #17212a;outline-offset:1px}
+.vac-bar{background:var(--person-color)!important;border:1px solid color-mix(in srgb,var(--person-color) 80%,#444)!important;opacity:1;color:#18222a;box-shadow:none}
+.vac-bar span{font-weight:650}
+@media print{.vac-bar{background:var(--person-color)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* v4.4: vacaciones mensuales con casilleros altos y sin franjas vacías entre semanas */
+.vacation-sheet.vac-month .vac-week{
+  grid-template-rows:32px repeat(var(--lanes),minmax(25px,auto));
+  min-height:57px;
+  margin:0;
+  border-top:0;
+}
+.vacation-sheet.vac-month .vac-week:first-of-type{border-top:1px solid #cdd8df}
+.vacation-sheet.vac-month .vac-day{padding:5px 5px;font-size:12px}
+.vacation-sheet.vac-month .vac-bar{min-height:21px;padding:3px 5px;margin:1px 2px;font-size:11px}
+@media print{
+  .vacation-sheet.vac-month .vac-week{
+    grid-template-rows:8mm repeat(var(--lanes),minmax(6.5mm,auto));
+    min-height:14.5mm;
+    margin:0;
+    border-top:0;
+  }
+  .vacation-sheet.vac-month .vac-week:first-of-type{border-top:1px solid #cdd8df}
+}
+
+/* v4.5: vista automática de vacaciones, dos meses contiguos */
+.vac-calendar-grid.double{grid-template-columns:repeat(2,minmax(0,1fr));gap:5mm;align-items:start}
+.vacation-sheet.vac-double .vac-month h3{font-size:15px}
+.vacation-sheet.vac-double .vac-week{grid-template-rows:17px repeat(var(--lanes),minmax(16px,auto));min-height:40px;margin:0;border-top:0}
+.vacation-sheet.vac-double .vac-week:first-of-type{border-top:1px solid #cdd8df}
+.vacation-sheet.vac-double .vac-day{font-size:10px;padding:2px}
+.vacation-sheet.vac-double .vac-bar{font-size:9px;min-height:15px;margin:1px}
+@media print{
+ .vacation-sheet.vac-double .vac-week{grid-template-rows:4.5mm repeat(var(--lanes),minmax(4mm,auto));min-height:9mm}
+ .vacation-sheet.vac-double .vac-month{break-inside:avoid;page-break-inside:avoid}
+}
+@media(max-width:700px){.vac-calendar-grid.double{grid-template-columns:1fr}}
+
+/* Tema del Escritorio: afecta la interfaz, nunca el papel imprimible */
+:root{--ui-bg:#f2f6f8;--ui-panel:#fff;--ui-text:#22313d;--ui-muted:#657581;--ui-border:#dbe5e9;--ui-accent:#167d89}
+html[data-embed-color="violeta"]{--ui-accent:#7644bf}
+html[data-embed-color="sigri"]{--ui-accent:#009a9d}
+html[data-embed-theme="dark"]{--ui-bg:#161923;--ui-panel:#242938;--ui-text:#f1f2f8;--ui-muted:#bbc3d3;--ui-border:#42495b}
+html[data-embed-theme="dark"] body{background:var(--ui-bg);color:var(--ui-text)}
+html[data-embed-theme="dark"] .toolbar,html[data-embed-theme="dark"] .panel{background:var(--ui-panel);border-color:var(--ui-border);box-shadow:none}
+html[data-embed-theme="dark"] .no-print p,html[data-embed-theme="dark"] .hint,html[data-embed-theme="dark"] .status{color:var(--ui-muted)}
+html[data-embed-theme="dark"] .no-print input,html[data-embed-theme="dark"] .no-print select{background:#343b4d;color:#fff;border-color:#606a7b}
+html[data-embed-theme="dark"] .person{border-color:var(--ui-border)}
+html[data-embed-theme="dark"] .theme-option{color:#25313b}
+html[data-embed-theme="dark"] .sheet{color:#22313d}
+html[data-embed-theme="dark"] .sheet h2{color:#22313d}
+html[data-embed-theme="dark"] .sheet p{color:#53636c}
+html[data-embed-theme="dark"] .sheet .custom-heading{color:var(--accent)}
+html[data-embed-theme] .no-print button:not(.danger):not(.secondary),html[data-embed-theme] .tabs button.active{background:var(--ui-accent)}
+html[data-embed-theme] .tabs button:not(.active){background:var(--ui-panel);color:var(--ui-text);border:1px solid var(--ui-border)}
+html[data-embed-theme] .app{max-width:1500px;padding:16px 20px}
+@media(max-width:650px){html[data-embed-theme] .app{padding:10px}.toolbar,.panel{padding:12px}.sheet{overflow-x:auto}}
+@media print{html[data-embed-theme] body{background:white!important;color:#22313d!important}html[data-embed-theme] .sheet{color:#22313d!important}}
+
+/* División opcional de turnos: etiquetas pequeñas, sin rotación ni superposición */
+.week-shifts .shift-label-col{width:14mm}
+.week-shifts .shift-corner{width:14mm}
+.week-shifts th.shift-label{font-size:10px;letter-spacing:0;font-weight:650;text-align:center;vertical-align:middle;white-space:nowrap;padding:2px;background:var(--head);color:#334b55;border:1px solid #cbd7db}
+.week-shifts tbody tr:first-child td{border-bottom:1.5px solid #667c87}
+.week-shifts td{height:61mm}
+@media print{.week-shifts td{height:59.5mm}.week-shifts th.shift-label{font-size:9px}}
+body.portrait .week-shifts td{height:82.5mm}
+@media print{body.portrait .week-shifts td{height:82.5mm}}
+</style><style id="orientationPageStyle">@page{size:A4 landscape;margin:9mm}</style></head><body><main class="app"><header class="no-print"><h1>📅 Generador de Calendarios</h1></header><nav class="tabs no-print" id="tabs"><button data-mode="week">Semanal</button><button data-mode="month" class="active">Mensual</button><button data-mode="semester">Semestral</button><button data-mode="year">Anual</button></nav><section class="toolbar no-print"><div class="field"><label>Año</label><input id="year" type="number" min="2000" max="2100" value="2026"></div><div class="field" id="monthField"><label>Mes</label><select id="month"></select></div><div class="field hidden" id="weekField"><label>Semana que contiene</label><input id="weekDate" type="date"></div><div class="field hidden" id="semesterField"><label>Semestre</label><select id="semester"><option value="0">Enero a junio</option><option value="6">Julio a diciembre</option></select></div><div class="field"><label>Hoja</label><select id="orientation"><option value="landscape">Horizontal</option><option value="portrait">Vertical</option></select></div><div class="field"><label>Feriados argentinos</label><select id="showHolidays"><option value="yes">Mostrar</option><option value="no">Ocultar</option></select></div><button id="print">🖨️ Imprimir / Guardar PDF</button></section><section class="panel no-print" id="designSettings"><div class="row" style="align-items:center;justify-content:space-between"><strong>Personalización</strong><button type="button" class="secondary" id="themeToggle" aria-expanded="false">⚙️ Temas</button></div><div id="themeMenu" class="theme-menu hidden"></div><div id="titleSettings" class="row"><div class="field"><label>Título Superior</label><input id="customTitle" placeholder="Ej.: Planificación de Sistemas" maxlength="100"></div></div><div class="row" id="fontSettings"><div class="field" style="max-width:330px"><label for="titleSize">Tamaño del título: <output id="titleSizeValue">28</output> px</label><input id="titleSize" type="range" min="18" max="48" step="2" value="28"></div></div><div id="weekShiftSettings" class="row hidden"><label style="display:flex;align-items:center;gap:9px;cursor:pointer"><input type="checkbox" id="weekShifts" style="width:18px;height:18px;min-width:18px;accent-color:var(--accent)"> Dividir la semana en Mañana y Tarde</label></div><div id="notesSettings" class="row"><div class="field"><label>Renglones para anotaciones</label><select id="notesEnabled"><option value="yes">Mostrar</option><option value="no">Ocultar</option></select></div><div class="field"><label>Imagen inferior (opcional)</label><input type="file" accept="image/*" id="bottomImage"></div><button class="secondary" id="clearBottomImage" type="button">Quitar imagen</button></div><div id="annualImages" class="row hidden"><div class="field"><label>Imagen a la izquierda del título (opcional)</label><input type="file" accept="image/*" id="leftImage"></div><div class="field"><label>Imagen a la derecha del título (opcional)</label><input type="file" accept="image/*" id="rightImage"></div><button class="secondary" id="clearAnnualImages" type="button">Quitar imágenes</button></div></section><div class="status no-print" id="status">Cargando feriados…</div><section id="output"></section></main><script>
+'use strict';
+const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const weekdays=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const $=id=>document.getElementById(id), pad=n=>String(n).padStart(2,'0');
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const date=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d,12)};
+const plus=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n,12);
+const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let mode='month', holidays=new Map(),fetchToken=0;
+let bottomImage='',leftImage='',rightImage='';
+const themes=[['Clásico','#167d89','#e8f2f4','#fff1e5','#ffffff'],['Océano','#2875ac','#d7eafa','#fce0ba','#f6fbff'],['Lavanda','#8260aa','#e9ddf6','#f6d8dc','#fcf9ff'],['Pastel','#bc786d','#f9e2dc','#f7ddb5','#fffaf7'],['Naturaleza','#568657','#dcedd7','#f5d6a7','#f9fcf6'],['Elegante','#343b46','#e5e7eb','#f3cfb8','#ffffff'],['Minimalista','#606a74','#f3f4f6','#ece0d2','#ffffff']];
+let themeIndex=Number(localStorage.getItem('calendariosTema')||0);if(!themes[themeIndex])themeIndex=0;
+function applyTheme(){const t=themes[themeIndex];['--accent','--head','--holiday'].forEach((key,i)=>document.documentElement.style.setProperty(key,t[i+1]));document.documentElement.style.setProperty('--paper','#ffffff');document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('chosen',Number(b.dataset.theme)===themeIndex));}
+$('themeMenu').innerHTML=themes.map((t,i)=>`<button type="button" class="theme-option" data-theme="${i}"><span class="swatches">${t.slice(1).map(c=>`<i style="background:${c}"></i>`).join('')}</span>${t[0]}</button>`).join('');
+$('themeToggle').onclick=()=>{const opened=$('themeMenu').classList.toggle('hidden');$('themeToggle').setAttribute('aria-expanded',String(!opened))};
+$('themeMenu').onclick=e=>{const b=e.target.closest('[data-theme]');if(!b)return;themeIndex=Number(b.dataset.theme);localStorage.setItem('calendariosTema',String(themeIndex));applyTheme();$('themeMenu').classList.add('hidden');$('themeToggle').setAttribute('aria-expanded','false')};applyTheme();
+async function readImage(input,cb){const file=input.files?.[0];if(!file)return;if(!file.type.startsWith('image/')||file.size>5*1024*1024){alert('Elegí una imagen de hasta 5 MB.');input.value='';return}const reader=new FileReader();reader.onload=()=>{cb(String(reader.result));render()};reader.readAsDataURL(file)}
+[['bottomImage',v=>bottomImage=v],['leftImage',v=>leftImage=v],['rightImage',v=>rightImage=v]].forEach(([id,cb])=>$(id).addEventListener('change',()=>readImage($(id),cb)));
+$('clearBottomImage').onclick=()=>{bottomImage='';$('bottomImage').value='';render()};$('clearAnnualImages').onclick=()=>{leftImage=rightImage='';$('leftImage').value=$('rightImage').value='';render()};
+$('titleSize').addEventListener('input',()=>{$('titleSizeValue').textContent=$('titleSize').value;render()});$('customTitle').addEventListener('input',render);$('notesEnabled').addEventListener('change',render);
+$('month').innerHTML=months.map((m,i)=>`<option value="${i}">${m}</option>`).join('');
+const today=new Date();$('year').value=today.getFullYear();$('month').value=today.getMonth();$('weekDate').value=iso(today);
+function yearsNeeded(){const y=Number($('year').value), m=Number($('month').value);if(mode==='week'){const d=date($('weekDate').value||iso(today));const start=plus(d,-((d.getDay()+6)%7));return [...new Set([start.getFullYear(),plus(start,6).getFullYear()])]}return [y]}
+// MISMA fuente que usa el módulo de feriados del Escritorio: api.argentinadatos.com/v1/feriados/{anio}
+const holidayCache=new Map();
+async function getHolidays(y){if(holidayCache.has(y))return holidayCache.get(y);const response=await fetch(`https://api.argentinadatos.com/v1/feriados/${y}`);if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();const map=new Map(data.filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.fecha)).map(x=>[x.fecha,x]));holidayCache.set(y,map);return map}
+async function refreshHolidays(){const token=++fetchToken;const yrs=yearsNeeded();$('status').textContent='';try{const maps=await Promise.all(yrs.map(getHolidays));if(token!==fetchToken)return;holidays=new Map(maps.flatMap(m=>[...m]));$('status').textContent=''}catch(e){if(token!==fetchToken)return;holidays=new Map();$('status').textContent='⚠️ No se pudieron consultar los feriados. Se puede imprimir, pero sin marcas de feriados. Revisá la conexión.'}render()}
+function holiday(d){return $('showHolidays').value==='yes'?holidays.get(iso(d)):null}
+function dayCell(d,month,small=false){if(!d||d.getMonth()!==month)return '<td class="empty"></td>';const h=holiday(d);return `<td class="${h?'holiday':''}" title="${h?escapeHtml(h.nombre):''}"><div class="day">${d.getDate()}</div>${h&&!small?`<div class="holname">${escapeHtml(h.nombre)}</div>`:''}</td>`}
+function calendarMonth(y,m,small=false){const first=new Date(y,m,1,12), offset=(first.getDay()+6)%7, count=new Date(y,m+1,0).getDate();const rows=Math.ceil((offset+count)/7);let html=`<table class="cal ${small?'mini':'month'}"><thead><tr>${weekdays.map(w=>`<th>${small?w.slice(0,1):w}</th>`).join('')}</tr></thead><tbody>`;for(let r=0;r<rows;r++){html+='<tr>';for(let c=0;c<7;c++){const n=r*7+c-offset+1;html+=dayCell(n>0&&n<=count?new Date(y,m,n,12):null,m,small)}html+='</tr>'}return html+'</tbody></table>'}
+function sheet(title,body,subtitle='',headerHtml=''){return `<article class="sheet">${headerHtml||`<h2>${escapeHtml(title)}</h2>`}${subtitle?`<p class="subheading">${escapeHtml(subtitle)}</p>`:''}${body}</article>`}
+function upperMonth(d){return months[d.getMonth()].toLocaleUpperCase('es-AR')}
+function longDate(d){return `${d.getDate()} de ${upperMonth(d)}`}
+function notesFooter(){if($('notesEnabled').value!=='yes'&&!bottomImage)return '';const lines=$('notesEnabled').value==='yes'?'<div class="note-lines">'+Array.from({length:5},()=>'<div></div>').join('')+'</div>':'';const pic=bottomImage?`<div class="footer-image"><img src="${bottomImage}" alt="Imagen personalizada"></div>`:'';return `<div class="sheet-footer">${lines}${pic}</div>`}
+function customHeading(){const v=$('customTitle').value.trim();return v?`<div class="custom-heading">${escapeHtml(v)}</div>`:''}
+function renderWeek(){
+ const d=date($('weekDate').value||iso(today)),start=plus(d,-((d.getDay()+6)%7));
+ const days=Array.from({length:7},(_,i)=>plus(start,i)),end=days[6];
+ const shifts=$('weekShifts').checked;
+ const th=days.map(x=>`<th>${weekdays[(x.getDay()+6)%7]} ${x.getDate()}</th>`).join('');
+ const cells=days.map(x=>{const h=holiday(x);return `<td class="${h?'holiday':''}">${h?`<div class="holname">🇦🇷 ${escapeHtml(h.nombre)}</div>`:''}</td>`}).join('');
+ const heading=start.getMonth()===end.getMonth()&&start.getFullYear()===end.getFullYear()?`Semana del ${start.getDate()} al ${end.getDate()} de ${upperMonth(start)} de ${end.getFullYear()}`:`Semana del ${longDate(start)}${start.getFullYear()!==end.getFullYear()?' de '+start.getFullYear():''} al ${longDate(end)} de ${end.getFullYear()}`;
+ // La división es opcional y se imprime junto con etiquetas discretas.
+ const table=shifts
+   ? `<table class="cal week week-shifts"><colgroup><col class="shift-label-col"><col span="7"></colgroup><thead><tr><th class="shift-corner"></th>${th}</tr></thead><tbody><tr><th scope="row" class="shift-label">Mañana</th>${cells}</tr><tr><th scope="row" class="shift-label">Tarde</th>${days.map(()=>'<td></td>').join('')}</tr></tbody></table>`
+   : `<table class="cal week"><thead><tr>${th}</tr></thead><tbody><tr>${cells}</tr></tbody></table>`;
+ return sheet(heading,`${customHeading()}${table}${notesFooter()}`);
+}
+function renderMonth(){const y=Number($('year').value),m=Number($('month').value);return sheet(`${months[m]} ${y}`,`${customHeading()}${calendarMonth(y,m)}${notesFooter()}`)}
+function monthHolidayList(y,m){if($('showHolidays').value!=='yes')return '';const items=[...holidays.entries()].filter(([key])=>key.startsWith(`${y}-${pad(m+1)}-`)).sort(([a],[b])=>a.localeCompare(b));return items.length?`<div class="holiday-list">${items.map(([key,h])=>`<div><b>${Number(key.slice(8))}</b> — ${escapeHtml(h.nombre||'Feriado')}</div>`).join('')}</div>`:''}
+function renderMulti(semester){const y=Number($('year').value),start=semester?Number($('semester').value):0,range=semester?6:12;const cards=Array.from({length:range},(_,i)=>{const m=start+i;return `<section class="mini"><h3>${months[m]}</h3>${calendarMonth(y,m,true)}${semester?monthHolidayList(y,m):''}</section>`}).join('');const heading=semester?`${start===0?'1°':'2°'} Semestre ${y}`:`Calendario ${y}`;const header=semester?'':`<div class="annual-heading">${leftImage?`<img src="${leftImage}" alt="Decoración izquierda">`:'<span></span>'}<h2>${escapeHtml(heading)}</h2>${rightImage?`<img src="${rightImage}" alt="Decoración derecha">`:'<span></span>'}</div>`;return sheet(heading,`<div class="miniwrap ${semester?'sem':''}">${cards}</div>`,'',header).replace('class="sheet"',`class="sheet${semester?' semester-sheet':' annual-sheet'}"`)}
+function render(){
+ document.documentElement.style.setProperty('--title-size',$('titleSize').value+'px');
+ $('monthField').classList.toggle('hidden',mode!=='month');
+ $('weekField').classList.toggle('hidden',mode!=='week');
+ $('weekShiftSettings').classList.toggle('hidden',mode!=='week');
+ $('semesterField').classList.toggle('hidden',mode!=='semester');
+ $('titleSettings').classList.toggle('hidden',!['week','month'].includes(mode));
+ $('notesSettings').classList.toggle('hidden',!['week','month'].includes(mode));
+ $('annualImages').classList.toggle('hidden',mode!=='year');
+ $('output').innerHTML=mode==='week'?renderWeek():mode==='month'?renderMonth():mode==='semester'?renderMulti(true):renderMulti(false);
+}
+$('tabs').addEventListener('click',e=>{const btn=e.target.closest('[data-mode]');if(!btn)return;mode=btn.dataset.mode;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('active',x===btn));render();refreshHolidays()});
+$('year').addEventListener('change',()=>{render();refreshHolidays()});$('weekDate').addEventListener('change',()=>{render();refreshHolidays()});['month','semester','showHolidays'].forEach(id=>$(id).addEventListener('change',render));
+$('weekShifts').addEventListener('change',render);
+$('orientation').addEventListener('change',()=>{document.body.classList.toggle('portrait',$('orientation').value==='portrait');$('orientationPageStyle').textContent=`@page{size:A4 ${$('orientation').value};margin:9mm}`});
+$('print').addEventListener('click',()=>window.print());
+refreshHolidays();
+</script>
+<script id="calendar-embed-theme">
+(function(){
+ const apply=(d)=>{if(!d||d.type!=='CALENDARIOS_THEME')return;
+ document.documentElement.setAttribute('data-embed-theme',d.theme==='dark'?'dark':'light');
+ document.documentElement.setAttribute('data-embed-color',d.color==='sigri'?'sigri':'violeta');};
+ window.addEventListener('message',e=>{if(e.origin!==location.origin)return;apply(e.data)});
+ try{if(window.parent!==window){apply({type:'CALENDARIOS_THEME',theme:parent.document.documentElement.getAttribute('data-theme'),color:parent.document.documentElement.getAttribute('data-color-theme')})}}catch(e){}
+})();
+</script>
+</body></html>
