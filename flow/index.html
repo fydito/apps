@@ -1,1 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mi Flow · Apps de Fydito</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#11131a;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif}
+body{display:flex;flex-direction:column}
+.toolbar{height:50px;flex:0 0 50px;background:#171a23;color:#fff;display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid #303747}
+.toolbar strong{color:#74d379;margin-right:8px;white-space:nowrap}
+.toolbar button{border:1px solid #5d6576;background:#242938;color:#fff;border-radius:8px;padding:7px 12px;font-weight:700;cursor:pointer}
+.toolbar button:hover{background:#147b68;border-color:#1d9b81}
+.toolbar .spacer{flex:1}
+.toolbar .hint{font-size:12px;color:#b9c1cf}
+#editor{flex:1;width:100%;min-height:0;border:0;background:#11131a}
+input{display:none}
+@media(max-width:720px){.toolbar strong,.hint{display:none}.toolbar{padding:7px}.toolbar button{padding:7px 9px}}
 
+html[data-theme="light"],html[data-theme="light"] body{background:#f5f6f8}
+html[data-theme="light"] .toolbar{background:#f2f3f5;color:#202124;border-bottom-color:#d5d8de}
+html[data-theme="light"] .toolbar strong{color:#2f8f3a}
+html[data-theme="light"] .toolbar button{background:#fff;color:#202124;border-color:#b8bec9}
+html[data-theme="light"] .toolbar button:hover{background:#147b68;color:#fff;border-color:#1d9b81}
+html[data-theme="light"] .toolbar .hint{color:#5f6368}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <strong>🔀 Mi Flow</strong>
+  <button id="nuevo">Nuevo</button>
+  <button id="abrir">Abrir</button>
+  <button id="guardar">Guardar .drawio</button>
+  <button id="volver" type="button" title="Volver a Apps de Fydito">← Apps</button><div class="spacer"></div>
+  <span class="hint">Diagramas de flujo y organigramas</span>
+</div>
+<iframe id="editor" src="about:blank" allow="clipboard-read; clipboard-write"></iframe>
+<input id="archivo" type="file" accept=".drawio,.xml">
+<script>
+const editor=document.getElementById('editor');
+const archivo=document.getElementById('archivo');
+
+const EDITOR_BASE='https://embed.diagrams.net/?embed=1&proto=json&spin=1&libraries=1&themes=1&saveAndExit=0&noExitBtn=1&lang=es';
+
+function temaDelEscritorio(){
+  try { const saved=localStorage.getItem('fydito_theme'); if(saved==='light'||saved==='dark')return saved; }catch(e){}
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+const temaInicial=temaDelEscritorio();
+document.documentElement.dataset.theme=temaInicial;
+document.body.style.background=temaInicial==='dark' ? '#11131a' : '#ffffff';
+editor.style.background=temaInicial==='dark' ? '#11131a' : '#ffffff';
+editor.src=EDITOR_BASE + (temaInicial==='dark' ? '&ui=dark' : '&ui=kennedy');
+let nombre='flujograma.drawio';
+let xml='';
+let pendiente='';
+
+const VACIO='<mxfile host="Mi Flow"><diagram name="Página-1"><mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827"><root><mxCell id="0"/><mxCell id="1" parent="0"/></root></mxGraphModel></diagram></mxfile>';
+
+function enviar(obj){editor.contentWindow.postMessage(JSON.stringify(obj),'https://embed.diagrams.net')}
+function cargar(data){xml=data||VACIO;enviar({action:'load',xml:xml,autosave:1,title:nombre,fit:1})}
+function descargar(data){
+  const blob=new Blob([data],{type:'application/xml;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=nombre.endsWith('.drawio')?nombre:nombre+'.drawio';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+window.addEventListener('message',e=>{
+  if(e.origin!=='https://embed.diagrams.net')return;
+  let m;try{m=typeof e.data==='string'?JSON.parse(e.data):e.data}catch{return}
+  if(!m||!m.event)return;
+  if(m.event==='init')cargar(xml||VACIO);
+  if((m.event==='autosave'||m.event==='save')&&m.xml)xml=m.xml;
+  if(m.event==='export'&&pendiente==='guardar'){
+    const data=m.xml||m.data||xml;
+    if(data){xml=data;descargar(data)}
+    pendiente='';
+  }
+});
+document.getElementById('volver').onclick=()=>window.location.href='../';
+document.getElementById('nuevo').onclick=()=>{
+  if(confirm('¿Crear un diagrama nuevo? Los cambios no guardados se perderán.')){
+    nombre='flujograma.drawio';xml=VACIO;cargar(xml);
+  }
+};
+document.getElementById('abrir').onclick=()=>archivo.click();
+archivo.onchange=async()=>{
+  const f=archivo.files[0];if(!f)return;
+  try{const t=await f.text();if(!t.trim())throw 0;nombre=f.name.replace(/\.xml$/i,'.drawio');cargar(t)}
+  catch{alert('No se pudo abrir el archivo.')}
+  archivo.value='';
+};
+document.getElementById('guardar').onclick=()=>{pendiente='guardar';enviar({action:'export',format:'xml'})};
+document.addEventListener('keydown',e=>{
+  if(e.code==='Escape'){
+    e.preventDefault();
+    window.location.href='../';
+  }
+});
+</script>
+</body>
+</html>
