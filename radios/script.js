@@ -23,6 +23,7 @@ const radios = [
 const vinyls=Array.from({length:10},(_,i)=>`vinilo${i+1}.gif`);
 const audio=document.getElementById("audio"),nameEl=document.getElementById("station-name"),freqEl=document.getElementById("frequency"),visual=document.getElementById("visual"),statusEl=document.getElementById("status"),playBtn=document.getElementById("play"),volume=document.getElementById("volume"),muteBtn=document.getElementById("mute"),player=document.querySelector(".player"),selectEl=document.getElementById("station-select");
 let index=0,hls=null,wantedToPlay=false,lastVinyl=-1;
+const nowPlaying=document.getElementById("nowplaying");
 function randomVinyl(){let n;do{n=Math.floor(Math.random()*vinyls.length)}while(vinyls.length>1&&n===lastVinyl);lastVinyl=n;visual.src=vinyls[n]}
 function renderList(){selectEl.innerHTML=radios.map((r,i)=>`<option value="${i}" ${i===index?'selected':''}>${r.nombre} · ${r.frecuencia}</option>`).join('')}
 selectEl.onchange=()=>loadRadio(Number(selectEl.value),true);
@@ -52,7 +53,7 @@ function setStream(url){
   audio.appendChild(source);
  }
 }
-function loadRadio(newIndex,autoplay=false){index=(newIndex+radios.length)%radios.length;const r=radios[index];nameEl.textContent=r.nombre;freqEl.textContent=r.frecuencia;randomVinyl();renderList();statusEl.textContent=autoplay?'Conectando…':'Lista para escuchar';playBtn.textContent='▶';wantedToPlay=autoplay;try{setStream(r.stream);notifyParent();if(autoplay)playCurrent()}catch(e){statusEl.textContent='No se pudo preparar esta radio';console.error(e)}}
+function loadRadio(newIndex,autoplay=false){index=(newIndex+radios.length)%radios.length;const r=radios[index];nameEl.textContent=r.nombre;freqEl.textContent=r.frecuencia;nowPlaying.textContent="Escuchando en vivo";randomVinyl();renderList();statusEl.textContent=autoplay?'Conectando…':'Lista para escuchar';playBtn.textContent='▶';wantedToPlay=autoplay;try{setStream(r.stream);notifyParent();if(autoplay)playCurrent()}catch(e){statusEl.textContent='No se pudo preparar esta radio';console.error(e)}}
 async function playCurrent(){wantedToPlay=true;statusEl.textContent='Conectando…';randomVinyl();try{await audio.play();playBtn.textContent='❚❚';statusEl.textContent='🔴 EN VIVO'}catch(err){if(hls){hls.once(Hls.Events.MANIFEST_PARSED,async()=>{if(!wantedToPlay)return;try{await audio.play();playBtn.textContent='❚❚';statusEl.textContent='🔴 EN VIVO'}catch(e){statusEl.textContent='No se pudo reproducir'}})}else{statusEl.textContent='No se pudo reproducir';console.error(err)}}}
 playBtn.onclick=()=>{if(audio.paused)playCurrent();else{wantedToPlay=false;audio.pause();playBtn.textContent='▶';statusEl.textContent='Pausada'}};
 document.getElementById('prev').onclick=()=>loadRadio(index-1,true);document.getElementById('next').onclick=()=>loadRadio(index+1,true);
