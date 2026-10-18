@@ -12,7 +12,7 @@ for(const el of backCandidates){if(el.closest('header')||el.id==='volver'||el.cl
 if(existingTheme)existingTheme.style.display='none';
 function getSaved(){try{return localStorage.getItem('fydito-theme')||localStorage.getItem('fydito_theme')||'light'}catch(e){return 'light'}}
 function setTheme(mode){
- const dark=mode==='dark';root.dataset.theme=mode;
+ const dark=mode==='dark';root.dataset.theme=mode;root.dataset.embedTheme=mode;
  body.classList.toggle('dark',dark);body.classList.toggle('dark-theme',dark);body.classList.toggle('light-theme',!dark);
  root.style.setProperty('--fydito-nav-theme',mode);
  button.textContent=dark?'☀':'☾';button.title=dark?'Modo claro':'Modo oscuro';
