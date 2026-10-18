@@ -181,7 +181,7 @@ body.dark .hero-art {
     position:relative;
     display:flex;
     flex-direction:column;
-    height:190px;min-height:190px;
+    min-height:205px;
     background:var(--card);
     border:1px solid var(--border);
     border-radius:21px;
@@ -320,9 +320,10 @@ body.dark .hero-art {
     transition:none!important}
 
 }
-  .radio-card{grid-column:span 2;min-width:0;border-radius:21px;overflow:hidden;background:#162437;border:1px solid var(--border);box-shadow:var(--shadow);height:190px;min-height:190px}
-  .radio-card iframe{width:100%;height:100%;height:190px;min-height:190px;border:0;display:block}
-  @media(max-width:600px){.radio-card{grid-column:span 2;height:200px;min-height:200px}.radio-card iframe{height:200px;min-height:200px}}
+  .radio-card{grid-column:span 2;min-width:0;border-radius:21px;overflow:hidden;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);min-height:205px;transition:transform .18s,border-color .18s,box-shadow .18s}
+  .radio-card:hover,.radio-card:focus-within{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 14px 35px #049c6c25}
+  .radio-card iframe{width:100%;height:100%;min-height:205px;border:0;display:block}
+  @media(max-width:600px){.radio-card{grid-column:span 2;min-height:215px}.radio-card iframe{min-height:215px}}
   </style>
   <link href="fydito.png" rel="icon" type="image/png"/>
  </head>
@@ -527,6 +528,7 @@ body.dark .hero-art {
 
   function setTheme(isDark) {
     body.classList.toggle('dark', isDark);
+    document.querySelector('.radio-card iframe')?.contentWindow?.postMessage({type:'fydito-theme',theme:isDark?'dark':'light'}, location.origin);
     themeButton.textContent = isDark ? '☀' : '☾';
     try {
       localStorage.setItem('fydito-theme', isDark ? 'dark' : 'light');
@@ -546,6 +548,9 @@ body.dark .hero-art {
     ? savedTheme === 'dark'
     : matchMedia('(prefers-color-scheme: dark)').matches);
 
+  document.querySelector('.radio-card iframe')?.addEventListener('load', event => {
+    event.target.contentWindow.postMessage({type:'fydito-theme',theme:body.classList.contains('dark')?'dark':'light'},location.origin);
+  });
   themeButton.addEventListener('click', () => {
     setTheme(!body.classList.contains('dark'));
   });
