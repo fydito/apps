@@ -13,10 +13,12 @@ body{display:flex;flex-direction:column}
 .toolbar button{border:1px solid #5d6576;background:#242938;color:#fff;border-radius:8px;padding:7px 12px;font-weight:700;cursor:pointer}
 .toolbar button:hover{background:#147b68;border-color:#1d9b81}
 .toolbar .spacer{flex:1}
+.toolbar .flow-back{font-size:12px;text-decoration:none;white-space:nowrap;color:#e7f9f5;background:#183b47;border:1px solid #356276;border-radius:8px;padding:8px 11px;font-weight:700}
+.toolbar .flow-back:hover{background:#147b68;color:#fff;border-color:#1d9b81}
 .toolbar .hint{font-size:12px;color:#b9c1cf}
 #editor{flex:1;width:100%;min-height:0;border:0;background:#11131a}
 input{display:none}
-@media(max-width:720px){.toolbar strong,.hint{display:none}.toolbar{padding:7px}.toolbar button{padding:7px 9px}}
+@media(max-width:720px){.toolbar .hint{display:none}.toolbar strong{margin-right:0}.toolbar{padding:7px}.toolbar button{padding:7px 9px}}
 
 html[data-theme="light"],html[data-theme="light"] body{background:#f5f6f8}
 html[data-theme="light"] .toolbar{background:#f2f3f5;color:#202124;border-bottom-color:#d5d8de}
@@ -24,15 +26,18 @@ html[data-theme="light"] .toolbar strong{color:#2f8f3a}
 html[data-theme="light"] .toolbar button{background:#fff;color:#202124;border-color:#b8bec9}
 html[data-theme="light"] .toolbar button:hover{background:#147b68;color:#fff;border-color:#1d9b81}
 html[data-theme="light"] .toolbar .hint{color:#5f6368}
+html[data-theme="light"] .toolbar .flow-back{background:#fff;color:#12383d;border-color:#b8bec9}
+html[data-theme="light"] .toolbar .flow-back:hover{background:#147b68;color:#fff}
 </style>
-<link rel="stylesheet" href="../fydito-ui.css"></head>
+</head>
 <body>
 <div class="toolbar">
   <strong>🔀 Mi Flow</strong>
+  <a class="flow-back" href="../" title="Volver al escritorio">← Apps de Fydito</a>
   <button id="nuevo">Nuevo</button>
   <button id="abrir">Abrir</button>
   <button id="guardar">Guardar .drawio</button>
-  <button id="volver" type="button" title="Volver a Apps de Fydito">← Apps</button><div class="spacer"></div>
+  <div class="spacer"></div>
   <span class="hint">Diagramas de flujo y organigramas</span>
 </div>
 <iframe id="editor" src="about:blank" allow="clipboard-read; clipboard-write"></iframe>
@@ -44,7 +49,7 @@ const archivo=document.getElementById('archivo');
 const EDITOR_BASE='https://embed.diagrams.net/?embed=1&proto=json&spin=1&libraries=1&themes=1&saveAndExit=0&noExitBtn=1&lang=es';
 
 function temaDelEscritorio(){
-  try { const saved=localStorage.getItem('fydito_theme'); if(saved==='light'||saved==='dark')return saved; }catch(e){}
+  try { const saved=localStorage.getItem('fydito-theme') || localStorage.getItem('fydito_theme'); if(saved==='light'||saved==='dark')return saved; }catch(e){}
   return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
@@ -80,7 +85,7 @@ window.addEventListener('message',e=>{
     pendiente='';
   }
 });
-document.getElementById('volver').onclick=()=>window.location.href='../';
+
 document.getElementById('nuevo').onclick=()=>{
   if(confirm('¿Crear un diagrama nuevo? Los cambios no guardados se perderán.')){
     nombre='flujograma.drawio';xml=VACIO;cargar(xml);
@@ -101,5 +106,5 @@ document.addEventListener('keydown',e=>{
   }
 });
 </script>
-<script src="../fydito-ui.js"></script></body>
+</body>
 </html>
