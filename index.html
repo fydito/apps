@@ -320,6 +320,9 @@ body.dark .hero-art {
     transition:none!important}
 
 }
+  .radio-card{grid-column:span 2;min-width:0;border-radius:21px;overflow:hidden;background:#162437;border:1px solid var(--border);box-shadow:var(--shadow);min-height:205px}
+  .radio-card iframe{width:100%;height:100%;min-height:205px;border:0;display:block}
+  @media(max-width:600px){.radio-card{grid-column:span 2;min-height:215px}.radio-card iframe{min-height:215px}}
   </style>
   <link href="fydito.png" rel="icon" type="image/png"/>
  </head>
@@ -463,20 +466,9 @@ body.dark .hero-art {
       ›
      </span>
     </a>
-    <a class="app" href="./radios/">
-     <span class="glyph">
-      📻
-     </span>
-     <strong>
-      Radios
-     </strong>
-     <p>
-      Escuchá música mientras trabajás
-     </p>
-     <span class="go">
-      ›
-     </span>
-    </a>
+    <div class="radio-card" aria-label="Reproductor de radio integrado">
+      <iframe src="./radios/?embedded=1" title="Radios de Fydito" loading="lazy" allow="autoplay" scrolling="no"></iframe>
+    </div>
     <a class="app" href="./flow/">
      <span class="glyph">
       🔀
