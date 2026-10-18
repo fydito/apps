@@ -5,7 +5,7 @@ html[data-theme=dark]{color-scheme:dark;--bg:#0a1420;--panel:#172335;--fg:#eefbf
 main{max-width:1050px;margin:auto;padding:24px 16px 50px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.brand img{width:62px;height:62px;object-fit:contain;background:white;border-radius:16px;padding:5px}.brand h1{font-size:clamp(23px,4vw,36px);margin:0;line-height:1.1}.brand small{color:var(--muted)}.theme{border:1px solid var(--edge);background:var(--panel);color:var(--fg);border-radius:12px;padding:10px 15px;cursor:pointer}
 .pdf-card{border:1px solid var(--edge);border-radius:22px;background:var(--panel);padding:clamp(16px,3vw,32px);box-shadow:0 15px 40px #0000000c}.pdf-card>h2{margin:0 0 6px;font-size:24px}.pdf-intro{color:var(--muted);margin:0 0 22px}.pdf-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--edge);padding-bottom:16px}.pdf-tab{border:1px solid var(--edge);background:transparent;color:var(--fg);padding:11px 14px;border-radius:12px;cursor:pointer}.pdf-tab.active{background:var(--accent);color:#061e19;border-color:var(--accent);font-weight:750}.pdf-panel{display:none}.pdf-panel.active{display:block}.pdf-panel h3{font-size:20px;margin:0 0 6px}.pdf-panel p{color:var(--muted)}.pdf-panel label{display:block;font-weight:650;margin:14px 0 5px}.pdf-panel input:not([type=file]),.pdf-panel textarea,.pdf-panel select{display:block;width:100%;border:1px solid var(--edge);border-radius:10px;background:var(--bg);color:var(--fg);padding:12px;font:inherit}.pdf-panel input[type=file]{max-width:100%;margin:14px 0;padding:12px;border:1px dashed var(--edge);border-radius:12px}.pdf-panel button:not(.pdf-tab){background:var(--accent);color:#052a20;border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;margin:6px 6px 6px 0}.pdf-panel button:disabled{opacity:.5;cursor:not-allowed}.pdf-file-list{max-height:210px;overflow:auto;margin:10px 0}.pdf-file-list>div{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--bg);border-radius:10px;margin:6px 0;padding:8px 12px}.pdf-options-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.pdf-status{min-height:24px;margin:10px 0;font-weight:650}.pdf-status.ok{color:#0aab6a}.pdf-status.error{color:#e85d68}.pdf-reorder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin:16px 0}.pdf-reorder-page{background:var(--bg);border:1px solid var(--edge);border-radius:12px;padding:10px;text-align:center;cursor:grab}.pdf-reorder-page canvas{max-width:100%;height:auto}.pdf-reorder-number{display:block}.pdf-reorder-actions{display:flex;justify-content:center;gap:4px}.pdf-reorder-actions button{padding:6px!important}.foot{color:var(--muted);text-align:center;font-size:13px;margin-top:22px}
 @media(max-width:650px){.pdf-options-row{grid-template-columns:1fr}.brand img{width:48px;height:48px}.pdf-tabs{display:grid;grid-template-columns:1fr 1fr}.pdf-tab{font-size:13px}}
-</style><script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script><link rel="stylesheet" href="../fydito-ui.css"></head><body><main><header class="top"><div class="brand"><img src="fydito.png" alt="Fydito"><div><h1>PDF Tools</h1><small>Apps de Fydito · Tus archivos, a tu manera</small></div></div><button class="theme" id="themeBtn" type="button">☀️ / 🌙</button></header><div class="utility-card pdf-card">
+</style><script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script></head><body><main><header class="top"><div class="brand"><img src="fydito.png" alt="Fydito"><div><h1>PDF Tools</h1><small>Apps de Fydito · Tus archivos, a tu manera</small></div></div><button class="theme" id="themeBtn" type="button">☀️ / 🌙</button></header><div class="utility-card pdf-card">
 <h2 id="seccion-pdf">📄 Herramientas PDF</h2>
 <p class="pdf-intro">Uní, separá o creá PDFs directamente en tu navegador. Los archivos se procesan localmente.</p>
 <div class="pdf-tabs">
@@ -77,7 +77,18 @@ main{max-width:1050px;margin:auto;padding:24px 16px 50px}.top{display:flex;align
 <div class="pdf-status" id="pdfTextStatus"></div>
 </div>
 
-</div><p class="foot">Procesamiento local en tu navegador · Sin subir archivos al servidor</p></main><script>
+<div class="pdf-panel" id="pdf-word">
+<h3>📄 Convertir PDF a Word</h3>
+<p>Seleccioná un PDF para convertirlo a un documento Word editable (.docx) mediante Adobe PDF Services.</p>
+<form id="pdfWordForm" action="https://sigri.com.ar/pdfword/adobe.php" method="post" enctype="multipart/form-data" target="_blank">
+<label for="pdfWordFile">Archivo PDF</label>
+<input id="pdfWordFile" name="pdf" type="file" accept=".pdf,application/pdf" required>
+<div><button type="submit">Convertir y descargar Word ↗</button></div>
+</form>
+<p style="font-size:13px">La conversión se abre en otra pestaña y puede demorar. El archivo se envía a SIGRI y a Adobe para procesarlo; las demás herramientas PDF siguen funcionando localmente.</p>
+<div class="pdf-status" id="pdfWordStatus" role="status"></div>
+</div>
+</div><p class="foot">Las herramientas habituales procesan archivos localmente · PDF → Word utiliza Adobe a través de SIGRI</p></main><script>
         (function() {
             const {
                 PDFDocument,
@@ -101,6 +112,20 @@ main{max-width:1050px;margin:auto;padding:24px 16px 50px}.top{display:flex;align
             };
             const safe = s => (s || 'documento').trim().replace(/[<>:"/\\\\|?*\x00-\x1F]/g, '') || 'documento';
 
+            document.getElementById('pdfWordForm').addEventListener('submit', event => {
+                const file = document.getElementById('pdfWordFile').files[0];
+                if (!file || !(file.type === 'application/pdf' || /\.pdf$/i.test(file.name))) {
+                    event.preventDefault();
+                    status('pdfWordStatus', 'Seleccioná un archivo PDF válido.', 'error');
+                    return;
+                }
+                if (file.size > 50 * 1024 * 1024) {
+                    event.preventDefault();
+                    status('pdfWordStatus', 'El máximo admitido por el módulo es 50 MB.', 'error');
+                    return;
+                }
+                status('pdfWordStatus', 'Conversión enviada. Revisá la pestaña nueva para la descarga o los errores.');
+            });
             document.querySelectorAll('.pdf-tab').forEach(b => b.onclick = () => {
                 document.querySelectorAll('.pdf-tab,.pdf-panel').forEach(x => x.classList.remove('active'));
                 b.classList.add('active');
@@ -488,4 +513,4 @@ main{max-width:1050px;margin:auto;padding:24px 16px 50px}.top{display:flex;align
                 }
             };
 
-        })();</script><script>const root=document.documentElement;root.dataset.theme=localStorage.getItem('fydito-pdf-theme')||'light';document.getElementById('themeBtn').onclick=()=>{root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('fydito-pdf-theme',root.dataset.theme)};</script><script src="../fydito-ui.js"></script></body></html>
+        })();</script><script>const root=document.documentElement;root.dataset.theme=localStorage.getItem('fydito-pdf-theme')||'light';document.getElementById('themeBtn').onclick=()=>{root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('fydito-pdf-theme',root.dataset.theme)};</script></body></html>
