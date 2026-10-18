@@ -1,0 +1,9 @@
+/* Barra compartida de navegación Fydito */
+#fydito-global-nav{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1180px;margin:12px auto 18px;padding:0 16px;font:600 14px/1.3 system-ui,Arial,sans-serif;position:relative;z-index:50}
+#fydito-global-nav *{box-sizing:border-box}
+#fydito-global-nav a,#fydito-global-nav button{font:inherit;border:1px solid var(--fy-nav-border,#b7d7d0);border-radius:12px;background:var(--fy-nav-bg,#ffffff);color:var(--fy-nav-fg,#173c35);padding:10px 14px;text-decoration:none;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+#fydito-global-nav a:hover,#fydito-global-nav button:hover{border-color:#21c8ad;transform:translateY(-2px);background:var(--fy-nav-hover,#e5f9f3)}
+#fydito-global-nav button{min-width:48px}
+html[data-theme="dark"] #fydito-global-nav,body.dark #fydito-global-nav,body.dark-theme #fydito-global-nav{--fy-nav-bg:#1b3043;--fy-nav-fg:#eaf9fc;--fy-nav-border:#375c68;--fy-nav-hover:#25485a}
+@media(max-width:520px){#fydito-global-nav{padding:0 12px;margin:8px auto 12px}}
+@media print{#fydito-global-nav{display:none!important}}
