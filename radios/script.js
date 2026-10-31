@@ -1,4 +1,4 @@
-const radios = [
+const radiosFM = [
  {nombre:"La 100",frecuencia:"99.9 FM",stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/FM999_56.mp3"},
  {nombre:"Aspen",frecuencia:"102.3 FM",stream:"https://24283.live.streamtheworld.com/ASPENAAC.aac"},
  {nombre:"Rock & Pop",frecuencia:"95.9 FM",stream:"https://27593.live.streamtheworld.com/ROCKANDPOPAAC.aac"},
@@ -20,10 +20,28 @@ const radios = [
  {nombre:"Contacto",frecuencia:"95.3 FM",stream:"https://sonicpanel.hostradios.com/8144/stream"},
  {nombre:"Radio JARD 🇵🇱",frecuencia:"Białystok",stream:"https://stream4.nadaje.com:8745/jard1"}
 ];
+const radiosAM = [
+ {nombre:"Radio Mitre",frecuencia:"790 AM",stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/AM790_56AAC.aac"},
+ {nombre:"Radio La Red",frecuencia:"910 AM",stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/LA_RED_AM910AAC.aac"},
+ {nombre:"Radio Rivadavia",frecuencia:"630 AM",stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/RIVADAVIAAAC.aac"},
+ {nombre:"Radio 10",frecuencia:"710 AM",stream:"https://radio10.stweb.tv/radio10/live/playlist.m3u8"},
+ {nombre:"Radio Continental",frecuencia:"590 AM",stream:"https://edge01.radiohdvivo.com/continental"},
+ {nombre:"AM 750",frecuencia:"750 AM",stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/AM750AAC.aac"},
+ {nombre:"Radio Nacional",frecuencia:"870 AM",stream:"https://sa.mp3.icecast.magma.edge-access.net/sc_rad1"},
+ {nombre:"Splendid AM",frecuencia:"990 AM",stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/AM990AAC.aac"}
+];
+const BAND_KEY='tusRadios_banda';
+let band='FM';
+try{if(localStorage.getItem(BAND_KEY)==='AM')band='AM'}catch(e){}
+let radios=band==='AM'?radiosAM:radiosFM;
+function paintBand(){for(const b of ['FM','AM']){const el=document.getElementById('band-'+b.toLowerCase());el.classList.toggle('active',band===b);el.setAttribute('aria-pressed',String(band===b))}}
+function switchBand(nextBand){if(nextBand===band)return;band=nextBand;radios=band==='AM'?radiosAM:radiosFM;try{localStorage.setItem(BAND_KEY,band)}catch(e){}paintBand();loadRadio(0,false)}
+document.getElementById('band-fm').onclick=()=>switchBand('FM');
+document.getElementById('band-am').onclick=()=>switchBand('AM');
+const nowPlaying=document.getElementById("nowplaying");
 const vinyls=Array.from({length:10},(_,i)=>`vinilo${i+1}.gif`);
 const audio=document.getElementById("audio"),nameEl=document.getElementById("station-name"),freqEl=document.getElementById("frequency"),visual=document.getElementById("visual"),statusEl=document.getElementById("status"),playBtn=document.getElementById("play"),volume=document.getElementById("volume"),muteBtn=document.getElementById("mute"),player=document.querySelector(".player"),selectEl=document.getElementById("station-select");
 let index=0,hls=null,wantedToPlay=false,lastVinyl=-1;
-const nowPlaying=document.getElementById("nowplaying");
 function randomVinyl(){let n;do{n=Math.floor(Math.random()*vinyls.length)}while(vinyls.length>1&&n===lastVinyl);lastVinyl=n;visual.src=vinyls[n]}
 function renderList(){selectEl.innerHTML=radios.map((r,i)=>`<option value="${i}" ${i===index?'selected':''}>${r.nombre} · ${r.frecuencia}</option>`).join('')}
 selectEl.onchange=()=>loadRadio(Number(selectEl.value),true);
@@ -53,7 +71,7 @@ function setStream(url){
   audio.appendChild(source);
  }
 }
-function loadRadio(newIndex,autoplay=false){index=(newIndex+radios.length)%radios.length;const r=radios[index];nameEl.textContent=r.nombre;freqEl.textContent=r.frecuencia;nowPlaying.textContent="Escuchando en vivo";randomVinyl();renderList();statusEl.textContent=autoplay?'Conectando…':'Lista para escuchar';playBtn.textContent='▶';wantedToPlay=autoplay;try{setStream(r.stream);notifyParent();if(autoplay)playCurrent()}catch(e){statusEl.textContent='No se pudo preparar esta radio';console.error(e)}}
+function loadRadio(newIndex,autoplay=false){index=(newIndex+radios.length)%radios.length;const r=radios[index];nameEl.textContent=r.nombre;freqEl.textContent=r.frecuencia;if(nowPlaying)nowPlaying.textContent="Escuchando en vivo";randomVinyl();renderList();statusEl.textContent=autoplay?'Conectando…':'Lista para escuchar';playBtn.textContent='▶';wantedToPlay=autoplay;try{setStream(r.stream);notifyParent();if(autoplay)playCurrent()}catch(e){statusEl.textContent='No se pudo preparar esta radio';console.error(e)}}
 async function playCurrent(){wantedToPlay=true;statusEl.textContent='Conectando…';randomVinyl();try{await audio.play();playBtn.textContent='❚❚';statusEl.textContent='🔴 EN VIVO'}catch(err){if(hls){hls.once(Hls.Events.MANIFEST_PARSED,async()=>{if(!wantedToPlay)return;try{await audio.play();playBtn.textContent='❚❚';statusEl.textContent='🔴 EN VIVO'}catch(e){statusEl.textContent='No se pudo reproducir'}})}else{statusEl.textContent='No se pudo reproducir';console.error(err)}}}
 playBtn.onclick=()=>{if(audio.paused)playCurrent();else{wantedToPlay=false;audio.pause();playBtn.textContent='▶';statusEl.textContent='Pausada'}};
 document.getElementById('prev').onclick=()=>loadRadio(index-1,true);document.getElementById('next').onclick=()=>loadRadio(index+1,true);
@@ -72,4 +90,4 @@ window.addEventListener('message',e=>{
 });
 audio.addEventListener('playing',notifyParent);
 audio.addEventListener('pause',notifyParent);
-audio.volume=Number(volume.value);loadRadio(0,false);notifyParent();
+audio.volume=Number(volume.value);paintBand();loadRadio(0,false);notifyParent();
