@@ -6,7 +6,12 @@
 <div class="tabs"><button class="active" id="tab-texto" type="button">✍️ Pegar texto</button><button id="tab-pdf" type="button">📄 Leer documento</button></div>
 <section class="panel" id="panel-texto"><label for="text-input">Texto para narrar</label><textarea id="text-input" placeholder="Escribí o pegá el texto acá..."></textarea></section>
 <section class="panel" hidden="" id="panel-pdf"><label for="pdf-file">Seleccioná un documento</label><input accept=".pdf,.txt,.doc,.docx,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" id="pdf-file" type="file"/><div aria-live="polite" id="pdf-info"></div><div class="pdf-options"><div><label for="pdf-pages">Páginas (solo PDF)</label><input id="pdf-pages" placeholder="Ej.: 1-3, 5 (vacío = todas)" type="text"/></div><button class="secondary" disabled="" id="extract-btn" type="button">Extraer páginas</button></div><label for="pdf-text">Texto del documento</label><textarea id="pdf-text" placeholder="Acá aparecerá el contenido del documento..."></textarea></section>
-<label for="voice-select">Seleccioná una voz</label><select id="voice-select"></select><div class="buttons"><button id="speak-btn" type="button">▶ Reproducir</button><button class="secondary" id="stop-btn" type="button">■ Detener</button><button aria-expanded="false" class="secondary" id="vc-toggle" type="button">⏺ Grabar</button></div><div aria-live="polite" id="estado" role="status">Preparando voces...</div><section class="record-panel" hidden="" id="vc-studio"><h2>🎙️ Estudio de grabación</h2><div class="buttons"><button id="record-btn" type="button">⏺ Grabar narración</button><button class="secondary" disabled="" id="record-stop-btn" type="button">■ Detener grabación</button><span aria-label="Duración de la grabación" class="record-timer" hidden="" id="record-timer" role="timer"><span class="rec-dot"></span><span id="record-timer-value">00:00</span></span><img alt="Casete girando" class="tape-anim" hidden="" id="tape-anim" src="img/casete.gif"/></div><div aria-live="polite" id="record-status" role="status">Listo para grabar.</div><audio aria-label="Escuchar grabación" controls="" hidden="" id="record-preview"></audio><a hidden="" id="record-download">⬇ Descargar MP3</a></section>
+<label for="voice-select">Seleccioná una voz</label><div id="voice-gender-filter" role="group" aria-label="Filtrar voces por género" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px">
+<button type="button" class="secondary" data-voice-gender="male" aria-pressed="false">Hombre</button>
+<button type="button" class="secondary" data-voice-gender="female" aria-pressed="false">Mujer</button>
+<button type="button" data-voice-gender="all" aria-pressed="true">Todas</button>
+</div>
+<select id="voice-select"></select><div class="buttons"><button id="speak-btn" type="button">▶ Reproducir</button><button class="secondary" id="stop-btn" type="button">■ Detener</button><button aria-expanded="false" class="secondary" id="vc-toggle" type="button">⏺ Grabar</button></div><div aria-live="polite" id="estado" role="status">Preparando voces...</div><section class="record-panel" hidden="" id="vc-studio"><h2>🎙️ Estudio de grabación</h2><div class="buttons"><button id="record-btn" type="button">⏺ Grabar narración</button><button class="secondary" disabled="" id="record-stop-btn" type="button">■ Detener grabación</button><span aria-label="Duración de la grabación" class="record-timer" hidden="" id="record-timer" role="timer"><span class="rec-dot"></span><span id="record-timer-value">00:00</span></span><img alt="Casete girando" class="tape-anim" hidden="" id="tape-anim" src="img/casete.gif"/></div><div aria-live="polite" id="record-status" role="status">Listo para grabar.</div><audio aria-label="Escuchar grabación" controls="" hidden="" id="record-preview"></audio><a hidden="" id="record-download">⬇ Descargar MP3</a></section>
 <dialog aria-labelledby="capture-guide-title" class="capture-guide" id="capture-guide"><div class="capture-guide-content">
 <h2 id="capture-guide-title">Antes de grabar</h2>
 <img alt="Guía visual: en Edge elegí Pantalla completa, seleccioná la pantalla, activá compartir audio del sistema y presioná Compartir con audio." class="capture-guide-image" src="img/guia-captura.png"/>
@@ -24,9 +29,102 @@ function stop(){state.token++;state.playing=false;state.paused=false;state.chunk
 function updateControls(){const b=$('speak-btn');b.textContent=state.paused?'▶ Continuar':state.playing?'⏸ Pausar':'▶ Reproducir';$('stop-btn').disabled=!state.playing&&!state.paused;}
 function mode(next){stop();state.mode=next;for(const name of ['texto','pdf']){$('panel-'+name).hidden=name!==next;$('tab-'+name).classList.toggle('active',name===next);}status(next==='pdf'?'Seleccioná un documento para empezar.':'Ingresá un texto para empezar.');}
 $('tab-texto').onclick=()=>mode('texto');$('tab-pdf').onclick=()=>mode('pdf');
-function voices(){const previous=state.voices[Number($('voice-select').value)];// Países de América (incluido el Caribe) y España, según la región BCP-47 de cada voz.
-const allowedRegions=new Set('US CA MX GT BZ SV HN NI CR PA CU DO HT JM BS BB AG DM GD KN LC VC TT PR VI AI AW BM BQ CW KY MS TC SX GP MQ BL MF PM GL CO VE GY SR GF EC PE BO BR PY UY AR CL FK ES'.split(' '));
-state.voices=synth.getVoices().filter(v=>{const parts=v.lang.replace(/_/g,'-').toUpperCase().split('-');return parts.slice(1).some(part=>allowedRegions.has(part));});const sel=$('voice-select');sel.replaceChildren();state.voices.forEach((v,i)=>{const o=document.createElement('option');o.value=i;o.textContent=v.name+' ('+v.lang+')';sel.appendChild(o);});let index=previous?state.voices.findIndex(v=>v.name===previous.name&&v.lang===previous.lang):-1;if(index<0)index=state.voices.findIndex(v=>v.lang.toLowerCase().startsWith('es'));if(index>=0)sel.value=String(index);status(state.voices.length?`${state.voices.length} voces disponibles.`:'Esperando voces de América y España...');}
+let voiceGender='all';
+// Clasificación basada en las 48 voces reales que Jordy exportó de Edge (30/10/2026).
+// La clave combina región + nombre exacto, sin deducir género por nombres comunes.
+const voiceGenderCatalog = new Map([
+ ['es-ar|elena', 'female'],
+ ['es-ar|tomas', 'male'],
+ ['es-bo|marcelo', 'male'],
+ ['es-bo|sofia', 'female'],
+ ['es-cl|catalina', 'female'],
+ ['es-cl|lorenzo', 'male'],
+ ['es-co|gonzalo', 'male'],
+ ['es-co|salome', 'female'],
+ ['es-cr|juan', 'male'],
+ ['es-cr|maria', 'female'],
+ ['es-cu|belkys', 'female'],
+ ['es-cu|manuel', 'male'],
+ ['es-ec|andrea', 'female'],
+ ['es-ec|luis', 'male'],
+ ['es-sv|lorena', 'female'],
+ ['es-sv|rodrigo', 'male'],
+ ['es-es|alvaro', 'male'],
+ ['es-es|elvira', 'female'],
+ ['es-es|helena', 'female'],
+ ['es-es|laura', 'female'],
+ ['es-es|pablo', 'male'],
+ ['es-es|ximena', 'female'],
+ ['es-us|alonso', 'male'],
+ ['es-us|paloma', 'female'],
+ ['es-gt|andres', 'male'],
+ ['es-gt|marta', 'female'],
+ ['es-gq|javier', 'male'],
+ ['es-gq|teresa', 'female'],
+ ['es-hn|carlos', 'male'],
+ ['es-hn|karla', 'female'],
+ ['es-mx|dalia', 'female'],
+ ['es-mx|jorge', 'male'],
+ ['es-ni|federico', 'male'],
+ ['es-ni|yolanda', 'female'],
+ ['es-pa|margarita', 'female'],
+ ['es-pa|roberto', 'male'],
+ ['es-py|mario', 'male'],
+ ['es-py|tania', 'female'],
+ ['es-pe|alex', 'male'],
+ ['es-pe|camila', 'female'],
+ ['es-pr|karina', 'female'],
+ ['es-pr|victor', 'male'],
+ ['es-do|emilio', 'male'],
+ ['es-do|ramona', 'female'],
+ ['es-uy|mateo', 'male'],
+ ['es-uy|valentina', 'female'],
+ ['es-ve|paola', 'female'],
+ ['es-ve|sebastian', 'male']
+]);
+function normalizeVoiceName(value){
+ return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+}
+function classifyVoice(voice){
+ const locale=voice.lang.replace(/_/g,'-').toLowerCase();
+ // Nombres Edge: «Microsoft Elena Online (Natural) - Spanish (Argentina)».
+ const match=voice.name.match(/^Microsoft\s+(.+?)(?:\s+Online\s*\(|\s+-\s+Spanish\s*\(|$)/i);
+ if(!match)return 'unknown';
+ const key=normalizeVoiceName(locale+'|'+match[1].trim());
+ return voiceGenderCatalog.get(key)||'unknown';
+}
+const countryNames=new Intl.DisplayNames(['es'],{type:'region'});
+function voiceCountry(v){
+ const parts=v.lang.replace(/_/g,'-').split('-');
+ const region=parts.find((p,i)=>i>0&&/^[A-Za-z]{2}$/.test(p));
+ if(!region)return 'Sin país especificado';
+ try{return countryNames.of(region.toUpperCase())||region.toUpperCase();}catch{return region.toUpperCase();}
+}
+function renderVoiceList(previous){
+ const sel=$('voice-select');sel.replaceChildren();
+ const entries=state.voices.map((v,i)=>({v,i,country:voiceCountry(v)}))
+  .filter(x=>voiceGender==='all'||classifyVoice(x.v)===voiceGender)
+  .sort((a,b)=>a.country.localeCompare(b.country,'es')||a.v.name.localeCompare(b.v.name,'es'));
+ for(const entry of entries){const o=new Option(`${entry.country} — ${entry.v.name} (${entry.v.lang})`,String(entry.i));sel.add(o);}
+ const matched=previous&&entries.find(x=>x.v.name===previous.name&&x.v.lang===previous.lang);
+ const preferred=matched||entries.find(x=>x.v.lang.toLowerCase()==='es-ar')||entries.find(x=>x.v.lang.toLowerCase().startsWith('es'))||entries[0];
+ if(preferred)sel.value=String(preferred.i);
+ sel.disabled=!entries.length;
+ status(entries.length?`${entries.length} voces mostradas de ${state.voices.length} disponibles.`:'No hay voces clasificadas en esta categoría. Elegí «Todas».');
+}
+function voices(){
+ const previous=state.voices[Number($('voice-select').value)];
+ // Únicamente voces en español, independientemente del país.
+ state.voices=synth.getVoices().filter(v=>/^es(?:-|$)/i.test(v.lang.replace(/_/g,'-')));
+ renderVoiceList(previous);
+}
+document.querySelectorAll('[data-voice-gender]').forEach(btn=>btn.addEventListener('click',()=>{
+ if(recording.active||recording.starting)return;
+ const previous=state.voices[Number($('voice-select').value)];
+ voiceGender=btn.dataset.voiceGender;
+ document.querySelectorAll('[data-voice-gender]').forEach(b=>{const active=b===btn;b.setAttribute('aria-pressed',String(active));b.classList.toggle('secondary',!active);});
+ renderVoiceList(previous);
+}));
 if(synth){synth.addEventListener('voiceschanged',voices);voices();}else{$('speak-btn').disabled=true;status('Este navegador no admite síntesis de voz.');}
 function splitText(text,max=180){const sentences=text.replace(/\r/g,'').match(/[^.!?\n]+[.!?]?|\n+/g)||[text];const chunks=[];let current='';for(const sentence of sentences){const part=sentence.trim();if(!part)continue;if((current+' '+part).length<=max){current=(current+' '+part).trim();continue;}if(current){chunks.push(current);current='';}if(part.length<=max){current=part;continue;}const words=part.split(/\s+/);for(const word of words){if((current+' '+word).length>max&&current){chunks.push(current);current='';}if(word.length>max){if(current){chunks.push(current);current='';}for(let i=0;i<word.length;i+=max)chunks.push(word.slice(i,i+max));}else current=(current+' '+word).trim();}}if(current)chunks.push(current);return chunks;}
 function next(token){if(!state.playing||token!==state.token)return;if(state.position>=state.chunks.length){state.playing=false;state.paused=false;updateControls();status('Lectura finalizada.');if(recording.active&&recording.auto)finishRecording();return;}const u=new SpeechSynthesisUtterance(state.chunks[state.position]);const voice=state.voices[Number($('voice-select').value)];if(voice)u.voice=voice;u.onstart=()=>{if(token===state.token)status(`Leyendo fragmento ${state.position+1} de ${state.chunks.length}...`);};u.onend=()=>{if(token!==state.token)return;state.position++;if(state.playing)next(token);};u.onerror=e=>{if(token!==state.token)return;if(e.error==='canceled'||e.error==='interrupted')return;state.playing=false;state.paused=false;updateControls();status('Error de reproducción: '+e.error);if(recording.active&&recording.auto)finishRecording();};synth.speak(u);}
@@ -66,6 +164,7 @@ function captureControls(){
   if(recording.active||recording.starting){if(!el.dataset.preRecordDisabled)el.dataset.preRecordDisabled=el.disabled?'yes':'no';el.disabled=true;}
   else if(el.dataset.preRecordDisabled){el.disabled=el.dataset.preRecordDisabled==='yes';delete el.dataset.preRecordDisabled;}
  }
+  for(const btn of document.querySelectorAll('[data-voice-gender]')) btn.disabled=recording.active||recording.starting;
 }
 function cleanupCapture(){
  stopElapsed();
